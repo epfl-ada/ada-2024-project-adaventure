@@ -29,7 +29,11 @@ We are not planning on using any additional datasets.
 ### Organization within the team 
 * Michelle: conduct preliminary research on unfinished paths 
 ### Questions for TA
-Add here any questions you have for us related to the proposed project.
+
+Do we need to use all the data? Yes/No?
+
+Definition of time out -  Can we assume if enough clicks then time out game was too hard to finish?
+
 
 
 ### Additional things:
