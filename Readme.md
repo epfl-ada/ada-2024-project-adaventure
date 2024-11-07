@@ -29,6 +29,7 @@ We are not planning on using any additional datasets.
 ### Organization within the team 
 * Michelle: conduct preliminary research on unfinished paths 
 * Viktor: conduct preliminary research on shortest paths
+
 ### Questions for TA
 
 Do we need to use all the data? Yes/No?
