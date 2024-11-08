@@ -35,10 +35,3 @@ We are not planning on using any additional datasets.
 Do we need to use all the data? Yes/No?
 
 Definition of time out -  Can we assume if enough clicks then time out game was too hard to finish?
-
-
-
-### Additional things:
-GitHub repository should be well structured and contain all the code for the initial analyses and data handling pipelines. Please use linked repository in description as a template
-
-Notebook presenting the initial results to us. We will grade the correctness, quality of code, and quality of textual descriptions. There should be a single Jupyter notebook containing the main results. The implementation of the main logic should be contained in external scripts/modules that will be called from the notebook
