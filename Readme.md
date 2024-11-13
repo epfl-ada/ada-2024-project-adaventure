@@ -24,8 +24,9 @@ We have split our research questions into 3 key areas: <br>
 ### Additional dataset (if any)
 We are not planning on using any additional datasets. 
 
-### Methods
-#### Task 1: Data Preparation and Cleaning
+### Methods and Timeline
+#### Task 1: Data Preparation and Cleaning 
+**02.11.2024 - 15.11.2024**
   a. Data Collection and Cleaning <br>
   We start by loading the Wikispeedia dataset, which includes user navigation paths between articles. Initial cleaning will involve removing any redundant or incomplete      entries and standardizing formats for consistent data representation.
 
@@ -33,6 +34,7 @@ We are not planning on using any additional datasets.
   Next, we’ll classify each article by topic (e.g., science, culture, geography) and categorize links by type. This will help us analyze the relationship between article     topics and user navigation patterns.
 
 #### Task 2: Hub Analysis and User Pathway Metrics
+**16.11.2024 - 24.11.2024**
   a: Hub Identification using PageRank Algorithm <br>
   We identify hub articles by calculating the number of links each article has, both inbound and outbound. We’ll use a PageRank algorithm to rank articles based on their     connectedness and determine the largest and most influential hubs in the network.
 
@@ -40,13 +42,15 @@ We are not planning on using any additional datasets.
   To evaluate how effectively hubs reduce travel distance in the network, we’ll compute shortest paths between articles using Dijkstra’s algorithm. By comparing these        paths to actual user paths, we can assess the role of hubs in navigation efficiency.
 
 #### Task 3: Comparative Analysis of Hubs and User Navigation
+**25.11.2024 - 05.12.2024**
   a. Analyzing Successful and Unfinished Paths <br>
   To identify where players abandon paths, we’ll categorize common "blocks" or unfinished paths. We’ll compare these with successful paths to determine if certain hubs are   commonly associated with abandonment.
 
   b. Path Optimization and Intuition <br>
   We’ll compare user-selected paths with optimized shortest paths, analyzing any tendency for users to bypass large hubs in favor of more intuitive but less connected        links. This will reveal patterns in user decision-making.
 
-#### Task 4: Reporting Insights and Answering Research Questions
+#### Task 4: Reporting Insights and Answering Research Questions, Final Report Compilation
+**06.12.202 - 18.12.2024**
   a. Interpret Findings on Knowledge Gaps and Cultural Bias <br>
   Finally, we’ll analyze the results to draw conclusions about public knowledge, intuitive navigation, and cultural biases, using our findings on common vs. specialized      knowledge, navigation patterns, and hub influence.
 
@@ -54,8 +58,7 @@ We are not planning on using any additional datasets.
 * Michelle: conduct preliminary research on unfinished paths 
 * Viktor: conduct preliminary research on shortest paths
 * Antoine: conduct preliminary research on unfinished paths despite small semantic distance
+
 ### Questions for TA
 
-Do we need to use all the data? Yes/No?
-
-Definition of time out -  Can we assume if enough clicks then time out game was too hard to finish?
+None
