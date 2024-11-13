@@ -58,7 +58,8 @@ We are not planning on using any additional datasets.
 * Michelle: conduct preliminary research on unfinished paths 
 * Viktor: conduct preliminary research on shortest paths
 * Antoine: conduct preliminary research on unfinished paths despite small semantic distance
-* Lisa: conduct preliminary research on dataset and worked on reading in the data. 
+* Lisa: conduct preliminary research on dataset and worked on reading in the data.
+* Madeleine : conduct preliminary research on behaviour similarity 
 
 ### Questions for TA
 
