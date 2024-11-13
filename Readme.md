@@ -48,7 +48,6 @@ We are not planning on using any additional datasets.
 
 #### Task 4: Reporting Insights and Answering Research Questions
   a. Interpret Findings on Knowledge Gaps and Cultural Bias <br>
-  
   Finally, we’ll analyze the results to draw conclusions about public knowledge, intuitive navigation, and cultural biases, using our findings on common vs. specialized      knowledge, navigation patterns, and hub influence.
 
 ### Organization within the team 
