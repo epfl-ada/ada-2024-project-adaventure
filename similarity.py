@@ -2,7 +2,7 @@
 import networkx as nx
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+#from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -39,7 +39,7 @@ def get_games(data):
     data.paths_finished["start"] = data.paths_finished["path"].apply(lambda x: x[0])
     data.paths_finished["end"] = data.paths_finished["path"].apply(lambda x: x[-1])
     games["nb_games"] = 0
-    for i in tqdm(range(len(data.paths_finished))):
+    for i in range(len(data.paths_finished)):
         start = data.paths_finished.loc[i,"start"]
         end = data.paths_finished.loc[i,"end"]
         games.loc[(games["start"]==start) & (games["end"]==end), "nb_games"] += 1
