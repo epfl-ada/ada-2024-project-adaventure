@@ -4,11 +4,11 @@ from urllib.parse import unquote
 
 class WikispeediaData:
     def __init__(self):
-        self.articles = pd.read_csv('articles.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = [ 'article_name'])
-        self.categories = pd.read_csv('categories.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['article_name', 'category_name'])
-        self.links = pd.read_csv('links.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['1st article', '2nd article'])
-        self.paths_finished = pd.read_csv('paths_finished.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['hashedIpAddress',  'timestamp',   'durationInSec',   'path',   'rating'])
-        self.paths_unfinished = pd.read_csv('paths_unfinished.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['hashedIpAddress',  'timestamp',   'durationInSec',   'path','target','rating'])
+        self.articles = pd.read_csv('data/wikispeedia_paths-and-graph/articles.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = [ 'article_name'])
+        self.categories = pd.read_csv('data/wikispeedia_paths-and-graph/categories.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['article_name', 'category_name'])
+        self.links = pd.read_csv('data/wikispeedia_paths-and-graph/links.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['1st article', '2nd article'])
+        self.paths_finished = pd.read_csv('data/wikispeedia_paths-and-graph/paths_finished.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['hashedIpAddress',  'timestamp',   'durationInSec',   'path',   'rating'])
+        self.paths_unfinished = pd.read_csv('data/wikispeedia_paths-and-graph/paths_unfinished.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['hashedIpAddress',  'timestamp',   'durationInSec',   'path','target','rating'])
         self.matrix = self.load_shortest_paths()
 
         self.preprocess()
@@ -16,7 +16,7 @@ class WikispeediaData:
 
 
     def load_shortest_paths(self):
-        file_path = 'shortest-path-distance-matrix.txt'
+        file_path = 'data/wikispeedia_paths-and-graph/shortest-path-distance-matrix.txt'
 
         # Read file
         with open(file_path, 'r') as file:
@@ -32,7 +32,7 @@ class WikispeediaData:
             row = []
             for char in line:
                 if char == '_':
-                    row.append(np.inf)  # Inaccessible paths
+                    row.append(np.nan)  # Inaccessible paths
                 else:
                     try:
                         row.append(int(char))  # Convert to integer
@@ -49,6 +49,7 @@ class WikispeediaData:
         return l[1:]
     
     def different_cat(self,link):
+        #Question: How are we handeling that some articles have
         article_1 = link["1st article"]
         article_2 = link["2nd article"]
         category_1 = self.categories["1st cat"][self.categories["article_name"]== article_1]
