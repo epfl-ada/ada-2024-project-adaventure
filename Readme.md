@@ -56,7 +56,7 @@ We are not planning on using any additional datasets.
 
 ### Organization within the team 
 * Michelle: conduct preliminary research on unfinished paths 
-* Viktor: conduct preliminary research on shortest paths
+* Viktor: conduct preliminary research on shortest paths and link network
 * Antoine: conduct preliminary research on unfinished paths despite small semantic distance
 * Lisa: conduct preliminary research on dataset and worked on reading in the data.
 * Madeleine : conduct preliminary research on behaviour similarity 
