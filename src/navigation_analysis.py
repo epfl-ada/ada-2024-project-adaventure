@@ -29,7 +29,28 @@ def get_category_navigation_matrix(data):
             prevSubject = nextSubject
     # return to pandas dataframe
     subject_connections = pd.DataFrame(subject_connections_df, index=subject_connections.index, columns=subject_connections.columns)
-    return subject_connections, subjects
+
+    links_nr = []
+    for subject1 in subject_connections.index:
+        for subject2 in subject_connections.index:
+            links_nr.append([subject1, subject2, subject_connections.loc[subject1, subject2]])
+    
+    links_nr = pd.DataFrame(links_nr, columns=['Category 1st article', 'Category 2nd article', 'edge_weight'])
+    # Calculates the amount of articles there are in each category
+    links_nr = links_nr.sort_values(by=['Category 1st article', 'Category 2nd article'], ascending=False)
+        
+    category_freq = data.categories['1st cat'].value_counts().reset_index(name="node_size")
+
+    # Add the amount of articles in source-cateogry
+    links_nr = links_nr.merge(right=category_freq, 
+                            left_on='Category 1st article', 
+                            right_on = '1st cat', 
+                            how='left')
+
+    # Only keeps links between different categories
+    links_nr = links_nr[links_nr['Category 1st article'] != links_nr['Category 2nd article']].reset_index()
+
+    return links_nr
 
 def plot_category_connections(subject_connections, subject_count, subjects):
     # Get the maximum and minimum weights, with or without the diagonal
@@ -43,7 +64,7 @@ def plot_category_connections(subject_connections, subject_count, subjects):
     colormap_diag = mcolors.LinearSegmentedColormap.from_list("YellowRed", ["yellow", "red"])
     norm_diag = mcolors.Normalize(vmin=0, vmax=max_weight_diag)
 
-    # Create positions for 16 points arranged in a circle
+    # Create positions for points arranged in a circle
     angle = np.linspace(0, 2 * np.pi, len(subjects), endpoint=False)
     positions = {subject: (x, y) for (x, y), subject in zip(np.c_[np.cos(angle), np.sin(angle)], subject_connections.index)}
 

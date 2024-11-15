@@ -36,7 +36,8 @@ def get_grouped_category_data(data, includeGeography=True):
 
     # Gives the amount of connections between all categories
     links_nr = links_nr.value_counts(subset=['Category 1st article', 'Category 2nd article']).reset_index(name='edge_weight')
-
+    links_nr = links_nr.sort_values(by=['Category 1st article', 'Category 2nd article'], ascending=False)
+        
     # Calculates the amount of articles there are in each category
     category_freq = data.categories['1st cat'].value_counts().reset_index(name="node_size")
 
@@ -54,7 +55,7 @@ def get_grouped_category_data(data, includeGeography=True):
 
     return links_nr
 
-def create_sum_graph(data, links_nr):
+def create_sum_graph(data, links_nr, title='Links between categories'):
 
         # Creates a graph between categories
         G = nx.from_pandas_edgelist(links_nr, 
@@ -88,7 +89,7 @@ def create_sum_graph(data, links_nr):
                 font_weight='bold', 
                 node_color=sns.color_palette(n_colors=15))
         # fig.set_facecolor("skyblue")
-        plt.title('Links between categories')
+        plt.title(title)
         plt.show()
 
 
