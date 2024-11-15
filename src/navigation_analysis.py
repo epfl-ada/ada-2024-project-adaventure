@@ -5,72 +5,16 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from urllib.parse import unquote
 from matplotlib.patches import Polygon
-import os
 
-def get_dataframe_like_Lisa():
-    #copy pasted.
-    dataframes = {}
-    def reading_filenames(input_dir):
-        files = [f for f in os.listdir(input_dir) if f.endswith('.tsv') or f.endswith('.txt')]
-        return files
-    data_folder = 'data/wikispeedia_paths-and-graph/'
-    file_names = reading_filenames(data_folder)
-    #Reading files in dictionary
-    for file in file_names:
-        try:
-            if file.endswith('.tsv'):
-                df = pd.read_csv(data_folder + file, sep='\t', comment='#', header = None, encoding="utf-8")
-            else:
-                df = pd.read_csv(data_folder + file, sep=',', comment='#', header = None, encoding="utf-8")
-            
-            dataframes[file.split('.')[0]] = df
-        except pd.errors.ParserError as e:
-            print(f"Could not parse {file}: {e}")
-    
-    dataframes["paths_finished"] = dataframes["paths_finished"].rename(columns={0: "hashedIpAddress",
-                                                                                1: "timestamp", 
-                                                                                2: "durationInSec", 
-                                                                                3: "path", 
-                                                                                4: "rating"})
-    # Adds target to paths_finished
-    dataframes["paths_finished"]["target"] = dataframes["paths_finished"]["path"].str.split(";").str[-1]
-
-    # Decode percentage-encoded characters in path in paths_finished
-    dataframes["paths_finished"]["path"] = dataframes["paths_finished"]["path"].apply(unquote)
-
-    dataframes["paths_unfinished"] = dataframes["paths_unfinished"].rename(columns={0: "hashedIpAddress",
-                                                                                1: "timestamp", 
-                                                                                2: "durationInSec", 
-                                                                                3: "path", 
-                                                                                4: "target",
-                                                                                5: "type"})
-
-    # Decode percentage-encoded characters in path in paths_unfinished
-    dataframes["paths_unfinished"]["path"] = dataframes["paths_unfinished"]["path"].apply(unquote)
-
-    dataframes['categories'] = dataframes['categories'].rename(columns={0: "article", 1: "category"})
-    #Decoding article names
-    dataframes["categories"]["article"] = dataframes["categories"]["article"].apply(unquote)
-    #Splitting categories into sub categories
-    split_columns = dataframes["categories"]['category'].str.split('.', expand=True)
-
-    #Dropping first column which only contains the word subject
-    split_columns = split_columns.drop(0, axis=1)
-    #Joining with original dataframe
-    dataframes["categories"] = dataframes["categories"].join(split_columns)
-
-    return dataframes
-
-
-def get_category_navigation_matrix(dataframes):
+def get_category_navigation_matrix(data):
     # create a matrix of the subjects with all 0.
-    categories = dataframes["categories"][1].unique()
+    categories = data.categories['1st cat'].unique()
     subject_connections = pd.DataFrame(0, index=categories, columns=categories)
     # get all the played paths
-    paths = pd.concat([dataframes["paths_unfinished"]["path"].str.split(";"), dataframes["paths_finished"]["path"].str.split(";")])
+    paths = pd.concat([data.paths_finished["path"], data.paths_unfinished["path"]])
     # Create a mapping from article to subject
     #make this a dict from dataframes["categories"]["article"] to dataframes["categories"][1]
-    article_to_subject = dataframes["categories"].set_index('article')[1].to_dict()
+    article_to_subject = data.categories.set_index('article_name')["1st cat"].to_dict()
 
     # Iterate through each path and update subject connections
     # turn numpy before for faster runtime
