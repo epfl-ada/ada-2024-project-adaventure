@@ -67,6 +67,7 @@ We are not planning on using any additional datasets.
   * measure path efficiency with Dijkstra's algorithm by 24.11.24
   * identify hub correlation to common knowledge by 15.12.24
 * Madeleine : conduct preliminary research on behaviour similarity 
+  * analyze game similarities between succesfull and unsucesful ones by 5.12.24
   * compile final report by 15.12.24
 ### Questions for TA
 
