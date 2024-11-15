@@ -3,11 +3,15 @@ from tqdm import tqdm
 
 
 def get_games_unfinished(data):
+    """
+    Get the unfinished games played by the users
+    """
     games = pd.DataFrame(columns=["start","target"])
     games["start"] = data.paths_unfinished["path"].apply(lambda x: x[0])
     games["target"] = data.paths_unfinished["target"]
     games.drop_duplicates(inplace=True)
 
+    # Get the number of games played from start to target
     data.paths_unfinished["start"] = data.paths_unfinished["path"].apply(lambda x: x[0])
     games["nb_games"] = 0
     for i in tqdm(range(len(data.paths_unfinished))):
@@ -20,6 +24,9 @@ def get_games_unfinished(data):
     return games
 
 def success_rate(games_unfinished, games_finished):
+    """
+    Compute the success rate of the unfinished games
+    """
     games_unfinished["success_rate"] = None
     
     for i in range(len(games_unfinished)):
@@ -30,12 +37,15 @@ def success_rate(games_unfinished, games_finished):
         g = games_finished[(games_finished["start"] == start) & (games_finished["end"] == end)]
         
         if len(g) > 0:
-            success_rate = g["nb_games"].iloc[0] / (g["nb_games"].iloc[0] + row["nb_games"])
+            success_rate = g["nb_games"].iloc[0] / (g["nb_games"].iloc[0] + row["nb_games"]) # Success rate = number of games finished / (number of games finished + number of games unfinished)
             games_unfinished.at[i, "success_rate"] = success_rate
     
     return games_unfinished
 
 def success_rate_category(data, games_unfinished):
+    """
+    Compute the success rate of the unfinished games by category of the target article
+    """
     
     article_to_subject = data.categories.set_index('article_name')["1st cat"].to_dict()
     target_unfinished_count = data.paths_unfinished['target'].map(article_to_subject).value_counts()
@@ -48,10 +58,14 @@ def success_rate_category(data, games_unfinished):
 
 
 def get_abandon_point(data):
+    """
+    Get the abandon point of the unfinished games
+    """
     abandon = pd.DataFrame(columns=["abandon_point"])
     abandon["abandon_point"] = data.paths_unfinished["path"].apply(lambda x: x[-1])
     abandon.drop_duplicates(inplace=True)
 
+    # Get the number of games stopped at the abandon point
     data.paths_unfinished["abandon_point"] = data.paths_unfinished["path"].apply(lambda x: x[-1])
     abandon["nb_games"] = 0
     for i in tqdm(range(len(data.paths_unfinished))):
@@ -63,18 +77,23 @@ def get_abandon_point(data):
     return abandon
 
 def target_category(data,unfinished_games,finished_games): 
+    """
+    Compute the distribution of the target articles by category in the finished and unfinished games
+    """
     target_finished = finished_games[["end","nb_games"]]
     target_unfinished = unfinished_games[["target","nb_games"]].copy()
 
+    # Get the category of the target articles in finished games
     target_finished["category"] = target_finished["end"].apply(
         lambda x: data.categories.loc[data.categories["article_name"] == x, "1st cat"].values[0]
         if not data.categories.loc[data.categories["article_name"] == x, "1st cat"].empty else None)
 
-
+    # Get the category of the target articles in unfinished games
     target_unfinished["category"] = target_unfinished["target"].apply(
         lambda x: data.categories.loc[data.categories["article_name"] == x, "1st cat"].values[0]
         if not data.categories.loc[data.categories["article_name"] == x, "1st cat"].empty else None)
     
+    # Get the number of games played by category in finished and unfinished games
     cat_count_finished = target_finished.groupby("category")["nb_games"].sum().reset_index()
     cat_count_unfinished = target_unfinished.groupby("category")["nb_games"].sum().reset_index()
 
