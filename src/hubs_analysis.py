@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from scipy.stats import pearsonr
 
 def get_hubs_dataframe(data):
     '''
