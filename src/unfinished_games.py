@@ -2,6 +2,10 @@ import pandas as pd
 from tqdm import tqdm
 
 
+import pandas as pd
+from tqdm import tqdm
+
+
 def get_games_unfinished(data):
     games = pd.DataFrame(columns=["start","target"])
     games["start"] = data.paths_unfinished["path"].apply(lambda x: x[0])
@@ -35,6 +39,16 @@ def success_rate(games_unfinished, games_finished):
     
     return games_unfinished
 
+def success_rate_category(data, games_unfinished):
+    
+    article_to_subject = data.categories.set_index('article_name')["1st cat"].to_dict()
+    target_unfinished_count = data.paths_unfinished['target'].map(article_to_subject).value_counts()
+    target_finished_count = data.paths_finished["end"].map(article_to_subject).value_counts()
+
+    target_count = target_unfinished_count + target_finished_count
+    target_success = target_finished_count / target_count 
+    target_success = target_success.sort_values(ascending=False)
+    return target_success
 
 
 def get_abandon_point(data):
@@ -54,11 +68,12 @@ def get_abandon_point(data):
 
 def target_category(data,unfinished_games,finished_games): 
     target_finished = finished_games[["end","nb_games"]]
-    target_unfinished = unfinished_games[["target","nb_games"]]
+    target_unfinished = unfinished_games[["target","nb_games"]].copy()
 
     target_finished["category"] = target_finished["end"].apply(
         lambda x: data.categories.loc[data.categories["article_name"] == x, "1st cat"].values[0]
         if not data.categories.loc[data.categories["article_name"] == x, "1st cat"].empty else None)
+
 
     target_unfinished["category"] = target_unfinished["target"].apply(
         lambda x: data.categories.loc[data.categories["article_name"] == x, "1st cat"].values[0]
