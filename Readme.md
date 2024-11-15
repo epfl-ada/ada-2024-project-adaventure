@@ -55,12 +55,19 @@ We are not planning on using any additional datasets.
   Finally, we’ll analyze the results to draw conclusions about public knowledge, intuitive navigation, and cultural biases, using our findings on common vs. specialized      knowledge, navigation patterns, and hub influence.
 
 ### Organization within the team 
-* Michelle: conduct preliminary research on unfinished paths 
+* Michelle:
+  * complete PageRank Algorithm Analysis by 24.11.24
+  * write report and analysis conclusions on knowledge gaps by 15.12.24 
 * Viktor: conduct preliminary research on shortest paths and link network
+  * complete path optimization and intution by 5.12.24
 * Antoine: conduct preliminary research on unfinished paths despite small semantic distance
+  * complete analysis on successful and unfinished paths by 5.12.24
+  * create webpage to host results on by 5.12.24   
 * Lisa: conduct preliminary research on dataset and worked on reading in the data.
+  * measure path efficiency with Dijkstra's algorithm by 24.11.24
+  * identify hub correlation to common knowledge by 15.12.24
 * Madeleine : conduct preliminary research on behaviour similarity 
-
+  * compile final report by 15.12.24
 ### Questions for TA
 
 None
