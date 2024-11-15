@@ -59,7 +59,7 @@ We are not planning on using any additional datasets.
   * complete PageRank Algorithm Analysis by 24.11.24
   * write report and analysis conclusions on knowledge gaps by 15.12.24 
 * Viktor: conduct preliminary research on shortest paths and link network
-  * complete path optimization and intution by 5.12.24
+  * complete path optimization and intuition by 5.12.24
 * Antoine: conduct preliminary research on unfinished paths despite small semantic distance
   * complete analysis on successful and unfinished paths by 5.12.24
   * create webpage to host results on by 5.12.24   
@@ -67,7 +67,7 @@ We are not planning on using any additional datasets.
   * measure path efficiency with Dijkstra's algorithm by 24.11.24
   * identify hub correlation to common knowledge by 15.12.24
 * Madeleine : conduct preliminary research on behaviour similarity 
-  * analyze game similarities between succesfull and unsucesful ones by 5.12.24
+  * analyze game similarities between successful and unsuccesful ones by 5.12.24
   * compile final report by 15.12.24
 ### Questions for TA
 
