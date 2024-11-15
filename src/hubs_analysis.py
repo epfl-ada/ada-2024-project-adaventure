@@ -30,3 +30,34 @@ def get_hubs_dataframe(data):
         df[category] = np.where(df['article_names'].isin(articles_in_category), 1, 0)
 
     return df
+
+
+def calculate_correlation(df, cols):
+    '''
+    This function calculates correlation between features in data frame
+
+    Args:
+    df: dataframe containing features to calculate correlation on
+    cols: columns to calculate correlation
+
+    Return:
+    p_values: array containing the p-values for each pair of columns.
+    correlation_matrix: array containing the correlation coefficients for each pair of columns.
+
+    '''
+    size = len(cols)
+    p_values = np.zeros((size,size))
+    correlation_matrix = np.zeros((size,size))
+
+    # Calculate p-values for each pair of columns
+    for i,i_col_name in enumerate(cols):
+        for j,j_col_name in enumerate(cols):
+            if i_col_name == j_col_name:
+                p_values[i,j] = 0  # p-value for correlation with itself
+                correlation_matrix[i,j]= 1
+            else:
+                corr, p_val = pearsonr(df[i_col_name], df[j_col_name])
+                p_values[i,j] = p_val
+                correlation_matrix[i,j] = corr
+
+    return p_values,correlation_matrix
