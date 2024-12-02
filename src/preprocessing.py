@@ -91,7 +91,10 @@ class WikispeediaData:
 
         #Preprocess links
         self.links['1st article'] = self.links['1st article'].apply(lambda x: unquote(x).replace('_', ' '))
+        #self.links['1st article'] = self.links['1st article'].apply(lambda x: x.strip('"'))
         self.links['2nd article'] = self.links['2nd article'].apply(lambda x: unquote(x).replace('_', ' '))
+        #self.links['2nd article'] = self.links['2nd article'].apply(lambda x: x.strip('"'))
+
         self.links['different_cat'] = self.links.apply(lambda x: self.different_cat(x), axis=1)
 
         #Preprocess paths_finished
