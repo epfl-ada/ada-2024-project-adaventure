@@ -22,15 +22,15 @@ def fig_Heatmap_bert(data):
     mean = np.mean(matrix_sim)
     print("Mean distance for game from ",start," to ",end, " : ",mean)
 
-    # Créer la heatmap
+    # Create heatnmap
     fig = go.Figure(data=go.Heatmap(
         z=matrix_sim,
-        colorscale='Blues',  # Palette de couleurs bleues
+        colorscale='Blues',  
         colorbar=dict(title="Distance"),
-        zmin=0,  # Limiter l'intensité entre 0 et 1
+        zmin=0,  
         zmax=1,
-        xaxis='x',  # Référence à l'axe x
-        yaxis='y',  # Référence à l'axe y
+        xaxis='x',  
+        yaxis='y',  
         hovertemplate='1st Path: %{x}<br>2nd Path: %{y}<br>Distance: %{z}<extra></extra>'  # Formatage de l'infobulle
 
     ))
@@ -38,33 +38,33 @@ def fig_Heatmap_bert(data):
     fig.update_layout(
         title='Semantic distance for different paths<br> for game from "Calculus" to "Paul McCartney"',
         title_font=dict(
-            size=15  # Taille de la police du titre
+            size=15  
         ),
-        title_x=0.5,  # Centrer le titre horizontalement
-        title_xanchor='center',  # Ancrage du titre au centre
+        title_x=0.5,  
+        title_xanchor='center',  
         xaxis=dict(
             title='1st path',
             tickmode='linear',
             ticks='outside',
             ticklen=5,
-            showgrid=False  # Masquer la grille horizontale
+            showgrid=False  
         ),
         yaxis=dict(
             title='2nd path',
             tickmode='linear',
             ticks='outside',
             ticklen=5,
-            showgrid=False  # Masquer la grille verticale
+            showgrid=False  
         ),
-        width=650,  # Largeur de la figure
-        height=600,  # Hauteur de la figure
-        margin=dict(l=20, r=20, t=60, b=40)  # Marge autour de la figure
+        width=650,  
+        height=600, 
+        margin=dict(l=20, r=20, t=60, b=40)  
     )
 
-    # Sauvegarder la heatmap en fichier HTML
+    # Save heatmap as HTML
     fig.write_html('heatmap_distance.html',config={"displayModeBar": False})
 
-    # Afficher la heatmap
+
     fig.show()
 
 def fig_top10_articles(data):
@@ -87,50 +87,43 @@ def fig_top10_articles(data):
             marker=dict(color=color_map[category]),
         ))
         
-    # Ajouter des détails à la figure
     fig.update_layout(
         title="Top 10 most visited articles",
-        title_x=0.5,  # Centrer le titre
+        title_x=0.5,  
         xaxis_title="Articles",
         yaxis_title="Number of visits during games",
-        template="plotly_white",  # Choisir un joli template (ex: plotly_dark)
+        template="plotly_white",  
         showlegend=True,
         xaxis={'categoryorder':'total descending'}
 
     )
     fig.update_xaxes(tickangle=0)
 
-    # Sauvegarder la figure en HTML
     fig.write_html("top_10_articles.html",config={"displayModeBar": False})
 
-    # Afficher la figure
     fig.show(config={"displayModeBar": False})
 
 
 
 def fig_top_cat(data):
-    # Exemple : dictionnaire de catégories avec leurs visites
     dict_categories = get_most_visited_categories(data, "1st cat")
 
-    # Créer un WordCloud avec une palette de couleurs personnalisée
 
     wordcloud = WordCloud(
         width=800,
         height=400,
         background_color="white",
-        colormap="coolwarm_r",  # Appliquer la palette de couleurs
+        colormap="coolwarm_r",  
         max_words=200,
-        contour_color='black',  # Contours noirs pour les mots
-        contour_width=2,  # Épaisseur des contours
+        contour_color='black',  
+        contour_width=2,  
     ).generate_from_frequencies(dict_categories)
 
-    # Affichage du WordCloud avec les paramètres ajustés
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     plt.title("Category Importance", fontsize=12)
 
-    # Sauvegarder l'image et afficher
     plt.savefig("wordcloud_categories.png", bbox_inches="tight")
     plt.show()
 
@@ -144,27 +137,23 @@ def fig_success_rate_heatmap(data):
     """
 
     success_rate = success_rate_category_pair(data)
-    # Convertir le dictionnaire en DataFrame
     df = pd.DataFrame(list(success_rate.items()), columns=['Category Pair', 'Success Rate'])
     df[['Start Category', 'Target Category']] = pd.DataFrame(df['Category Pair'].tolist(), index=df.index)
     df.drop(columns=['Category Pair'], inplace=True)
 
-    # Pivot pour créer une matrice de succès
     heatmap_data = df.pivot(index='Start Category', columns='Target Category', values='Success Rate')
 
-    # Créer la heatmap avec Plotly
     fig = go.Figure(
         data=go.Heatmap(
-            z=heatmap_data.values,  # Les taux de succès
-            x=heatmap_data.columns,  # Catégories cibles
-            y=heatmap_data.index,  # Catégories de départ
-            colorscale='Blues',  # Palette de couleurs agréable
+            z=heatmap_data.values,  
+            x=heatmap_data.columns,  
+            y=heatmap_data.index,  
+            colorscale='Blues',  
             colorbar=dict(title="Success Rate", titleside='right'),
             hovertemplate='Target: %{x}<br>Start: %{y}<br>Sucess rate: %{z}<extra></extra>'
         )
     )
 
-    # Ajouter des détails à la figure
     fig.update_layout(
         title="Success Rate by (Start Category, Target Category)",
         title_x=0.5,  # Centrer le titre
@@ -175,10 +164,8 @@ def fig_success_rate_heatmap(data):
         width=800
     )
 
-    # Sauvegarder la heatmap en HTML
     fig.write_html("success_rate_heatmap.html",config={"displayModeBar": False})
     
-    # Afficher la figure
     fig.show()
 
 
@@ -194,9 +181,9 @@ def fig_to_target(data):
     
     fig.update_layout(
     title="Distance from stopping point to target article",
-    title_x=0.5,  # Centrer le titre
-    showlegend=False,  # Désactiver la légende globale
-    template="plotly_white",  # Choisir un joli template
+    title_x=0.5,  
+    showlegend=False,  
+    template="plotly_white",  
     xaxis_title="Number of clicks",  
     yaxis_title="Number of unfinished games",  
     xaxis2_title="Distance to target", 
@@ -284,7 +271,6 @@ def sankey(data):
                       font_size=10)
     fig.write_html("sankey.html",config={"displayModeBar": False})
 
-    # Afficher le graphique
     fig.show()
 
 
