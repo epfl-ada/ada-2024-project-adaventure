@@ -16,9 +16,9 @@ def get_pageVSfreq_data(data, df_hubs):
     pu_article_fre = pu['path'].explode().dropna()
     article_fre = pd.concat([pf_article_fre, pu_article_fre], 
                             ignore_index=True).value_counts().to_frame().reset_index()
-
+    
     # Merge to also geat pagerank score and category for each article
-    freVpr = pf_article_fre.merge(right= df_hubs[['article_names', 'pagerank_score']], 
+    freVpr = article_fre.merge(right= df_hubs[['article_names', 'pagerank_score']], 
                                 how= 'left',
                                 left_on='path', 
                                 right_on='article_names').drop(columns=['path'])
