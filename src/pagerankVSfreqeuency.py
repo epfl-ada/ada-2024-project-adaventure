@@ -66,4 +66,10 @@ def plot_pageVSfreq(freVpr, category= None):
     fig.update_traces(marker=dict(size=4, opacity=1))
     fig.update_xaxes(range=[-4.5, -2])
     fig.update_yaxes(range=[-0.1, 4])
+
+    if category == None:
+        fig.write_html("pagerank_vs_frequency.html",config={"displayModeBar": False})
+    else:
+        fig.write_html("pagerank_vs_frequency_" + category + ".html",config={"displayModeBar": False})
+
     fig.show()
