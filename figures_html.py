@@ -60,12 +60,14 @@ def fig_Heatmap_bert(data):
         height=600, 
         margin=dict(l=20, r=20, t=60, b=40)  
     )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
 
     # Save heatmap as HTML
     fig.write_html('heatmap_distance.html',config={"displayModeBar": False})
 
 
-    fig.show()
+    fig.show(config={"displayModeBar": False})
 
 def fig_top10_articles(data):
     dict_articles = get_most_visited_articles(data)
@@ -98,11 +100,46 @@ def fig_top10_articles(data):
 
     )
     fig.update_xaxes(tickangle=0)
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
 
     fig.write_html("top_10_articles.html",config={"displayModeBar": False})
 
     fig.show(config={"displayModeBar": False})
 
+
+def fig_top10_links(data):
+    dict_links = get_paths_oflength_k(data, 2)
+    top_10 = sorted(dict_links.items(), key=lambda x: x[1], reverse=True)[:10]
+    top_10 = {f"{k[0]} -> {k[1]}": v for k, v in top_10}
+    articles, visits = zip(*top_10.items())
+    # Créer un graphique en barres
+    fig = go.Figure(go.Bar(
+        y=articles,    # Noms des articles (axe Y)
+        x=visits,      # Nombre de visites (axe X)
+        orientation='h',  # Orientation des barres horizontales
+        marker=dict(color='royalblue'),
+        text=visits,   # Afficher les valeurs sur les barres
+        textposition='auto',  # Positionner les valeurs sur les barres
+    ))
+
+    # Ajouter des détails à la figure
+    fig.update_layout(
+        title="Top 10 most visited links",
+        title_x=0.5,  # Centrer le titre
+        xaxis_title="Number of visits during games",
+        yaxis_title="Link",
+        template="plotly_white",  # Choisir un joli template (ex: plotly_dark)
+        showlegend=False
+    )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+
+    # Sauvegarder la figure en HTML
+    fig.write_html("top_10_links_visites.html",config={"displayModeBar": False})
+
+    # Afficher la figure
+    fig.show(config={"displayModeBar": False})
 
 
 def fig_top_cat(data):
@@ -163,10 +200,12 @@ def fig_success_rate_heatmap(data):
         height=600,
         width=800
     )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
 
     fig.write_html("success_rate_heatmap.html",config={"displayModeBar": False})
     
-    fig.show()
+    fig.show(config={"displayModeBar": False})
 
 
 
@@ -189,10 +228,12 @@ def fig_to_target(data):
     xaxis2_title="Distance to target", 
     yaxis2_title="Number of unfinished games",
     )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
 
     fig.write_html("dist_to_target.html",config={"displayModeBar": False})
 
-    fig.show()
+    fig.show(config={"displayModeBar": False})
 
 def get_stoptarget (data):
     dict ={}
@@ -266,11 +307,12 @@ def sankey(data):
             color = colors
         )
     ))
+    
 
     fig.update_layout(title_text="Commonly unkown connections between stop point and target",
                       font_size=10)
     fig.write_html("sankey.html",config={"displayModeBar": False})
 
-    fig.show()
+    fig.show(config={"displayModeBar": False})
 
 

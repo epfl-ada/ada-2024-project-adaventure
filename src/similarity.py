@@ -5,6 +5,9 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.spatial.distance import cosine
+from sentence_transformers import SentenceTransformer
+
 
 
 
@@ -35,6 +38,23 @@ def distance_matrix(data,path1,path2):
             D[i,j] = data.matrix[path1[i],path2[j]]
     min_d = np.min(D,axis=1)
     return (np.max(min_d)) # mean :  in average how many clicks to reach an article in the second path / max : the maximum number of clicks to reach an article in the second path
+
+def embedding_Bert(paths):
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    embeddings = []
+    for path in paths:
+        path = ' '.join(path)
+        embeddings.append(model.encode(path))
+    return embeddings
+    
+
+def distance_Bert(embeddings,i,j):
+    """
+    Compute the distance between two paths as the number of clicks to reach one path from the other
+    """
+    embedding1 = embeddings[i]
+    embedding2 = embeddings[j]
+    return cosine(embedding1,embedding2)
 
 ##########################################################################################
 
@@ -70,11 +90,17 @@ def get_sim_matrix(data,start,end,distance):
     if len(paths) == 1:
         print("Only one game played from ", start, " to ", end) # Only one game played from start to end (no similarity)
         return None
+    if distance == distance_Bert:
+        embeddings = embedding_Bert(paths["path"].values)
     for i in range(len(paths)):
         path1 = paths["path"].values[i]
-        for j in range(len(paths)):
+        for j in tqdm(range(len(paths))):
             path2 = paths["path"].values[j]
-            sim = max(distance(data,path1,path2),distance(data,path2,path1)) # Compute the similarity between the two paths
+            if distance == distance_Bert:
+                sim = distance(embeddings,i,j)
+            else:
+                sim = max(distance(data,path1,path2),distance(data,path2,path1)) # Compute the similarity between the two paths
+
             matrix_distance[i][j] = sim
     return matrix_distance
 
