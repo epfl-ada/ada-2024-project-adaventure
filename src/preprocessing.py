@@ -138,6 +138,9 @@ class WikispeediaData:
         cat_2["nb_in_unfinished_paths"] = cat_2["2nd cat"].apply(lambda x: self.get_nb(x,"2nd cat","nb_in_unfinished_paths"))
         cat_2["nb_links"] = cat_2["2nd cat"].apply(lambda x: self.get_nb(x,"2nd cat","nb_links"))
         return cat_1,cat_2
+    
+    def get_article_category(self,article,cat_type):
+        return self.categories[self.categories["article_name"]==article][cat_type].values[0]
 
 
 
