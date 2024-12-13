@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from src.shortest_paths import calculate_all_shortest_paths
 import ast
+import matplotlib.pyplot as plt
 
 def get_hub_positions(data, df_hubs):
     # Sample data: replace with actual data arrays
