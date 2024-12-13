@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 def load_fork_matrix(data, df_hubs):
     # Load shortest path matrix and initialize matrices
@@ -113,8 +114,7 @@ def plot_badChoices(matrix1, unused_links, article_names):
 
     # Filter articles with column sums above 0.5
     print(len(column_sums))
-    forgone_threshold = 1/3
-    forgone_indices = np.where((1 > column_sums) & (column_sums > forgone_threshold))[0]
+    forgone_indices = np.where((1 > column_sums))[0]
 
     # Create a DataFrame to associate articles with their forgone values and column sums ul
     forgone_articles_df = pd.DataFrame({
@@ -126,4 +126,28 @@ def plot_badChoices(matrix1, unused_links, article_names):
     # Sort by forgone value in descending order and get the top 100 articles
     top_forgone_articles = forgone_articles_df.sort_values(by='Forgone Value', ascending=False)
     print(top_forgone_articles.head(20))
-    return top_forgone_articles
+    return top_forgone_articles, column_sums
+
+
+# Function to create an interactive scatter plot
+def plot_forgone_vs_usage(forgone_df, title='Forgone Value vs Column Sums UL'):
+    # Create the interactive scatter plot with Plotly
+    fig = px.scatter(
+        forgone_df,
+        x='Column Sums UL',
+        y='Forgone Value',
+        text='Article',
+        hover_data=['Article', 'Forgone Value', 'Column Sums UL'],
+        title=title,
+        labels={'Forgone Value': 'Forgone Value', 'Column Sums UL': 'Number of Times Link Was Used'},
+    )
+
+    # Customize marker size and opacity
+    fig.update_traces(marker=dict(size=8, opacity=0.7), textposition='top center')
+
+    # Add axis lines for better context
+    fig.add_vline(x=forgone_df['Column Sums UL'].mean(), line_dash="dash", line_color="red", annotation_text="Mean UL")
+    fig.add_hline(y=forgone_df['Forgone Value'].mean(), line_dash="dash", line_color="red", annotation_text="Mean Forgone")
+
+    # Show the plot
+    fig.show()
