@@ -88,4 +88,8 @@ def get_most_visited_categories(data,cat_type = "1st cat"):
                         dict[cat] += 1
                     else:
                         dict[cat] = 1
+
+    for cat in dict.keys():
+        nb_articles = len(data.categories["1st cat"]== cat)
+        dict[cat] = dict[cat]/nb_articles
     return dict

@@ -69,6 +69,60 @@ def fig_Heatmap_bert(data):
 
     fig.show(config={"displayModeBar": False})
 
+
+def fig_Heatmap_bert_random(data):
+
+    matrix_sim = get_sim_matrix_random(data,distance_Bert)
+    mean = np.mean(matrix_sim)
+    print("Mean distance : ",mean)
+
+    # Create heatnmap
+    fig = go.Figure(data=go.Heatmap(
+        z=matrix_sim,
+        colorscale='Blues',  
+        colorbar=dict(title="Distance"),
+        zmin=0,  
+        zmax=1,
+        xaxis='x',  
+        yaxis='y',  
+        hovertemplate='1st Path: %{x}<br>2nd Path: %{y}<br>Distance: %{z}<extra></extra>'  # Formatage de l'infobulle
+
+    ))
+
+    fig.update_layout(
+        title='Semantic distance for 39 random paths',
+        title_font=dict(
+            size=15  
+        ),
+        title_x=0.5,  
+        title_xanchor='center',  
+        xaxis=dict(
+            title='1st path',
+            tickmode='linear',
+            ticks='outside',
+            ticklen=5,
+            showgrid=False  
+        ),
+        yaxis=dict(
+            title='2nd path',
+            tickmode='linear',
+            ticks='outside',
+            ticklen=5,
+            showgrid=False  
+        ),
+        width=650,  
+        height=600, 
+        margin=dict(l=20, r=20, t=60, b=40)  
+    )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+
+    # Save heatmap as HTML
+    fig.write_html('heatmap_distance.html',config={"displayModeBar": False})
+
+
+    fig.show(config={"displayModeBar": False})
+
 def fig_top10_articles(data):
     dict_articles = get_most_visited_articles(data)
     top_10 = sorted(dict_articles.items(), key=lambda x: x[1], reverse=True)[:10]

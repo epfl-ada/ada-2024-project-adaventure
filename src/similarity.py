@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.spatial.distance import cosine
 from sentence_transformers import SentenceTransformer
+import random
 
 
 
@@ -104,6 +105,26 @@ def get_sim_matrix(data,start,end,distance):
             matrix_distance[i][j] = sim
     return matrix_distance
 
+def get_sim_matrix_random(data,distance):
+    """
+    Compute the similarity matrix for a game played from start to end
+    """
+    paths =[get_random_path(data) for i in range(39)]
+    matrix_distance = np.zeros((len(paths),len(paths)))
+    if distance == distance_Bert:
+        embeddings = embedding_Bert(paths)
+    for i in range(len(paths)):
+        path1 = paths[i]
+        for j in tqdm(range(len(paths))):
+            path2 = paths[j]
+            if distance == distance_Bert:
+                sim = distance(embeddings,i,j)
+            else:
+                sim = max(distance(data,path1,path2),distance(data,path2,path1)) # Compute the similarity between the two paths
+
+            matrix_distance[i][j] = sim
+    return matrix_distance
+
 def plot_sim_matrices(data,starts,ends,distance = distance_Jaccard,title = "Similarity matrix",**kwargs):
     """
     Plot the similarity matrices for the games played from starts to ends
@@ -183,3 +204,20 @@ def plot_first_article_bar_chart(data, start, end):
 
     plt.tight_layout()
     plt.show()
+
+def get_random_path(data):
+    len_path = random.randint(1,10)
+    path =[]
+    i = random.randint(0,len(data.links))
+
+    path.append(data.links.loc[i,"1st article"])
+    for i in range(len_path):
+        possible_links = data.links[data.links["1st article"]== path[-1]]
+        i = random.choice(possible_links.index)
+        path.append(data.links.loc[i,"2nd article"])
+    return path
+
+    
+
+
+        
