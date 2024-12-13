@@ -32,7 +32,7 @@ def get_pageVSfreq_data(data, df_hubs):
     # Normalise user_frequency to take into account the probability of stumbling upon that article 
     N  = data.articles.shape[0]
     freVpr['user_freq'] = freVpr.apply(
-        lambda x: x['user_freq'] / (count if (count := data.links[data.links['2nd article'] == x['article_name']].shape[0]) != 0 else np.nan),
+        lambda x: x['user_freq'] / (freq if (freq := data.links[data.links['2nd article'] == x['article_name']].shape[0]/N) != 0 else np.nan),
         axis=1)
 
     # Remove NaN values created from spelling mistakes in data.links
@@ -68,13 +68,13 @@ def plot_pageVSfreq(freVpr, category= None):
         log_x=True, 
         log_y=True,  
         title='User Frequency vs PageRank Score',
-        labels={'pagerank_score': 'PageRank Score', 'user_frequency': 'User Frequency'}
+        labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
     )
     fig.add_vline(x=freVpr['pagerank_score'].mean(), line_dash="dash", line_color="red")
     fig.add_hline(y=freVpr['user_freq'].mean(), line_dash="dash", line_color="red")
     fig.update_traces(marker=dict(size=4, opacity=1))
-    # fig.update_xaxes(range=[-4.5, -2])
-    # fig.update_yaxes(range=[-0.1, 4])
+    fig.update_xaxes(range=[-4.5, -2])
+    fig.update_yaxes(range=[-0.1, 4])
 
     if category == None:
         fig.write_html("pagerank_vs_frequency.html",config={"displayModeBar": False})
