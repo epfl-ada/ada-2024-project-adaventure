@@ -36,7 +36,7 @@ def get_grouped_category_data(data, includeGeography=True):
 
     # Gives the amount of connections between all categories
     links_nr = links_nr.value_counts(subset=['Category 1st article', 'Category 2nd article']).reset_index(name='edge_weight')
-    links_nr = links_nr.sort_values(by=['Category 1st article', 'Category 2nd article'], ascending=False)
+    # links_nr = links_nr.sort_values(by=['Category 1st article', 'Category 2nd article'], ascending=False)
         
     # Calculates the amount of articles there are in each category
     category_freq = data.categories['1st cat'].value_counts().reset_index(name="node_size")

@@ -74,7 +74,7 @@ def plot_pageVSfreq(freVpr, category= None):
     fig.add_hline(y=freVpr['user_freq'].mean(), line_dash="dash", line_color="red")
     fig.update_traces(marker=dict(size=4, opacity=1))
     fig.update_xaxes(range=[-4.5, -2])
-    fig.update_yaxes(range=[-0.1, 4])
+    fig.update_yaxes(range=[2, 5.7])
 
     if category == None:
         fig.write_html("pagerank_vs_frequency.html",config={"displayModeBar": False})
