@@ -1,6 +1,8 @@
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def get_pageVSfreq_data(data, df_hubs):
 
@@ -82,3 +84,105 @@ def plot_pageVSfreq(freVpr, category= None):
         fig.write_html("pagerank_vs_frequency_" + category + ".html",config={"displayModeBar": False})
 
     fig.show()
+
+def plot_pageVSfreq_static(freVpr, category=None):
+    # Set Seaborn style
+    sns.set(style="whitegrid")
+    plt.figure(figsize=(12, 8))
+    
+    # Filter data if a category is provided
+    if category is not None:
+        freVpr = freVpr[freVpr['Category'] == category]
+        color_col = 'Under Category'
+        unique_categories = freVpr['Under Category'].unique()
+    else:
+        color_col = 'Category'
+        unique_categories = freVpr['Category'].unique()
+    
+    # Generate a color palette with enough unique colors
+    num_colors = len(unique_categories)
+    palette = sns.color_palette("tab20", num_colors)  # Use 'tab20' or another large palette
+    
+    # Create a dictionary to map each category to a color
+    color_mapping = dict(zip(unique_categories, palette))
+    
+    # Create a scatter plot with log scales
+    ax = sns.scatterplot(
+        data=freVpr,
+        x='pagerank_score',
+        y='user_freq',
+        hue=color_col,
+        palette=color_mapping,
+        legend='full',
+        s=40,  # Marker size
+        alpha=0.7  # Marker transparency
+    )
+    
+    # Plot vertical and horizontal lines for the means
+    plt.axvline(freVpr['pagerank_score'].mean(), color='red', linestyle='--', linewidth=1)
+    plt.axhline(freVpr['user_freq'].mean(), color='red', linestyle='--', linewidth=1)
+    
+    # Set log scales for both axes
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    
+    # Axis labels and title
+    plt.xlabel('PageRank Score', fontsize=14)
+    plt.ylabel('User Frequency', fontsize=14)
+    plt.title('User Frequency vs PageRank Score', fontsize=16)
+    
+    # Set x and y limits
+    plt.xlim([10**-4.5, 10**-2])
+    plt.ylim([10**2, 10**5.7])
+    
+    # Add a legend
+    plt.legend(title=color_col, bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Save the figure as an image file
+    if category is None:
+        plt.savefig("pagerank_vs_frequency.png", bbox_inches='tight', dpi=300)
+    else:
+        plt.savefig(f"pagerank_vs_frequency_{category}.png", bbox_inches='tight', dpi=300)
+    
+    # Show the plot
+    plt.show()
+
+freVpr = get_pageVSfreq_data(data, df_hubs)
+fig = plot_pageVSfreqStatic(freVpr)
+
+def get_quadrant_views(freVpr):
+    # Adds views from metadata to freVpr
+    metadata = pd.read_csv('data/metadata.csv')
+    freVpr = freVpr.merge(right=metadata[['article_name', 'views']], how='left', on='article_name')
+
+    # Calculates boundary for each
+    mean_ps = freVpr['pagerank_score'].mean()
+    mean_uf = freVpr['user_freq'].mean()
+
+    # Define what article belongs to what quadrant
+    conditions = [
+        (freVpr['pagerank_score'] <= mean_ps) & (freVpr['user_freq'] <= mean_uf),
+        (freVpr['pagerank_score'] <= mean_ps) & (freVpr['user_freq'] >= mean_uf),
+        (freVpr['pagerank_score'] >= mean_ps) & (freVpr['user_freq'] <= mean_uf),
+        (freVpr['pagerank_score'] >= mean_ps) & (freVpr['user_freq'] >= mean_uf)]
+    categories = ['lower left', 'upper left', 'lower right', 'upper right']
+
+    # Appoint corresponing quadrant to each article
+    freVpr['quadrant'] = np.select(conditions, categories)
+
+    # Calculates mean of the lower right and upper left quadrants
+    quadrant_data = freVpr.groupby(by='quadrant')['views'].mean().reset_index()
+    quadrant_data = quadrant_data[(quadrant_data['quadrant'] == 'upper left') | (quadrant_data['quadrant'] == 'lower right')]
+
+    # Creates plot
+    plt.figure(figsize=(10, 6)) 
+    sns.set_theme(style="darkgrid") 
+    plt.grid(color='white', linewidth=1)
+    ax = sns.barplot(data=quadrant_data, x='quadrant', y='views')
+    ax.set_facecolor('#D3D3D3')  
+    plt.title('Mean views of lower right and upper left quadrants', fontsize=16)
+    plt.xlabel('Quadrant', fontsize=14)
+    plt.ylabel('Mean Views', fontsize=14)
+
+    # Plots the results
+    plt.show()
