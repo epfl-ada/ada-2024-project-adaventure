@@ -64,6 +64,7 @@ def plot_pageVSfreq(freVpr, category= None):
         freVpr,
         x='pagerank_score',
         y='user_freq',
+        plot_bgcolor="#ebeaf2",
         color=color,
         category_orders=category_orders, 
         hover_data=['article_name'], 
