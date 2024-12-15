@@ -172,9 +172,9 @@ def get_quadrant_views(freVpr):
     plt.grid(color='white', linewidth=1)
     ax = sns.barplot(data=quadrant_data, x='quadrant', y='views')
     ax.set_facecolor('#D3D3D3')  
-    plt.title('Mean views of lower right and upper left quadrants', fontsize=16)
+    plt.title('Average monthly views of articles in lower right and upper left quadrants', fontsize=16)
     plt.xlabel('Quadrant', fontsize=14)
-    plt.ylabel('Mean Views', fontsize=14)
+    plt.ylabel('Average monthly views', fontsize=14)
 
     # Saves image as png
     plt.savefig("views_per_quadrant.png", bbox_inches='tight', dpi=300)
