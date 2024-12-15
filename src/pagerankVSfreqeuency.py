@@ -139,17 +139,8 @@ def plot_pageVSfreq_static(freVpr, category=None):
     # Add a legend
     plt.legend(title=color_col, bbox_to_anchor=(1.05, 1), loc='upper left')
     
-    # Save the figure as an image file
-    if category is None:
-        plt.savefig("pagerank_vs_frequency.png", bbox_inches='tight', dpi=300)
-    else:
-        plt.savefig(f"pagerank_vs_frequency_{category}.png", bbox_inches='tight', dpi=300)
-    
     # Show the plot
     plt.show()
-
-freVpr = get_pageVSfreq_data(data, df_hubs)
-fig = plot_pageVSfreqStatic(freVpr)
 
 def get_quadrant_views(freVpr):
     # Adds views from metadata to freVpr
@@ -184,6 +175,9 @@ def get_quadrant_views(freVpr):
     plt.title('Mean views of lower right and upper left quadrants', fontsize=16)
     plt.xlabel('Quadrant', fontsize=14)
     plt.ylabel('Mean Views', fontsize=14)
+
+    # Saves image as png
+    plt.savefig("views_per_quadrant.png", bbox_inches='tight', dpi=300)
 
     # Plots the results
     plt.show()
