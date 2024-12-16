@@ -41,6 +41,9 @@ def distance_matrix(data,path1,path2):
     return (np.max(min_d)) # mean :  in average how many clicks to reach an article in the second path / max : the maximum number of clicks to reach an article in the second path
 
 def embedding_Bert(paths):
+    """
+    Compute the embeddings of the paths using a pretrained BERT model
+    """
     model = SentenceTransformer('all-MiniLM-L6-v2')
     embeddings = []
     for path in paths:
@@ -51,7 +54,7 @@ def embedding_Bert(paths):
 
 def distance_Bert(embeddings,i,j):
     """
-    Compute the distance between two paths as the number of clicks to reach one path from the other
+    Compute the distance between two paths using the cosine similarity between their embeddings
     """
     embedding1 = embeddings[i]
     embedding2 = embeddings[j]
@@ -109,19 +112,13 @@ def get_sim_matrix_random(data,distance):
     """
     Compute the similarity matrix for a game played from start to end
     """
-    paths =[get_random_path(data) for i in range(39)]
+    paths =[get_random_path(data) for i in range(100)]
     matrix_distance = np.zeros((len(paths),len(paths)))
-    if distance == distance_Bert:
-        embeddings = embedding_Bert(paths)
+    embeddings = embedding_Bert(paths)
     for i in range(len(paths)):
-        path1 = paths[i]
         for j in tqdm(range(len(paths))):
-            path2 = paths[j]
-            if distance == distance_Bert:
-                sim = distance(embeddings,i,j)
-            else:
-                sim = max(distance(data,path1,path2),distance(data,path2,path1)) # Compute the similarity between the two paths
-
+            sim = distance(embeddings,i,j)
+            
             matrix_distance[i][j] = sim
     return matrix_distance
 
@@ -206,15 +203,18 @@ def plot_first_article_bar_chart(data, start, end):
     plt.show()
 
 def get_random_path(data):
-    len_path = random.randint(1,10)
+    """
+    Create a random path
+    """
+    len_path = random.randint(1,10) # Length of the path
     path =[]
-    i = random.randint(0,len(data.links))
+    i = random.randint(0,len(data.links)) # First article
 
     path.append(data.links.loc[i,"1st article"])
     for i in range(len_path):
-        possible_links = data.links[data.links["1st article"]== path[-1]]
+        possible_links = data.links[data.links["1st article"]== path[-1]] # Possible links from the last article
         i = random.choice(possible_links.index)
-        path.append(data.links.loc[i,"2nd article"])
+        path.append(data.links.loc[i,"2nd article"]) # Add a random article to the path
     return path
 
     

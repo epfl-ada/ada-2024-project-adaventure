@@ -6,7 +6,6 @@ from scipy.spatial.distance import cosine
 from collections import Counter
 
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
 def get_games_unfinished(data):
@@ -150,39 +149,62 @@ def target_category(data,unfinished_games,finished_games):
 ## GET ABANDON REASON 
 
 def is_deadend (data,article,t):
+    """
+    Check if an article is a deadend
+    Input:
+    - data: data object
+    - article: article to check
+    - t: threshold for the number of outgoing links
+    Output:
+    - boolean: True if the article is a deadend (less than t outgoing links), False otherwise
+    """
     links = data.links.loc[(data.links["1st article"] == article)]
     if (len(links)<t):
         return True
     return False
 
 def get_distance_totarget(article,target):
+    """ 
+    Get the semantic distance between the stopping article and the target article
+    """
+    model = SentenceTransformer('all-MiniLM-L6-v2')
     emb1 = model.encode(article)
     emb2 = model.encode(target)
     return cosine(emb1, emb2)
 
 def get_clics_totarget(data,article,target):
+    """
+    Get the number of clicks to reach the target article from the stopping article
+    """
+
     if article not in data.articles["article_name"].values or target not in data.articles["article_name"].values:
-        return 10
-    idx_article = int(data.articles[data.articles["article_name"]== article].index[0])
-    idx_target = int(data.articles[data.articles["article_name"]== target].index[0])
-    d = data.matrix[idx_article,idx_target]
+        return 10 # If the article is not in the dataset, return a high number of clicks
+    idx_article = int(data.articles[data.articles["article_name"]== article].index[0]) # Get the index of the article in the matrix
+    idx_target = int(data.articles[data.articles["article_name"]== target].index[0]) #Get the index of the target in the matrix
+    d = data.matrix[idx_article,idx_target] # Get the shortest path length between the article and the target 
     return d
 
 
 def get_reason_abandon(data,t_dead_end = 1):
-    data.paths_unfinished["stop_point"] = data.paths_unfinished["path"].apply(lambda x : x[-1])
+    """
+    Get the reason for abandoning the unfinished games
+    """
+    data.paths_unfinished["stop_point"] = data.paths_unfinished["path"].apply(lambda x : x[-1]) # Get the stopping point of the game
     data.paths_unfinished["abandon_reason"] = None
-    data.paths_unfinished["clicks_to_target"] = data.paths_unfinished.apply(lambda x: get_clics_totarget(data,x["stop_point"],x["target"]),axis=1) 
-    data.paths_unfinished["distance_to_target"] = data.paths_unfinished.apply(lambda x: get_distance_totarget(x["stop_point"],x["target"]),axis=1)
-    for i in tqdm(range(len(data.paths_unfinished))):
+
+    data.paths_unfinished["clicks_to_target"] = data.paths_unfinished.apply(lambda x: get_clics_totarget(data,x["stop_point"],x["target"]),axis=1) # Get the number of clicks missing to reach the target
+    data.paths_unfinished["distance_to_target"] = data.paths_unfinished.apply(lambda x: get_distance_totarget(x["stop_point"],x["target"]),axis=1) # Get the semantic distance from the stopping point to the target
+    
+    for i in tqdm(range(len(data.paths_unfinished))): # Go through all unfinished paths
         stop_point = data.paths_unfinished.loc[i,"stop_point"]
         abandon_reason = None
-        if is_deadend(data,stop_point,t_dead_end):
+        if is_deadend(data,stop_point,t_dead_end): # If the stopping point is a deadend
             abandon_reason = "deadend"
         else:
-            d = data.paths_unfinished.loc[i,"distance_to_target"]
-            if d < 0.1:
-                abandon_reason = "target_reached"
+            d = data.paths_unfinished.loc[i,"distance_to_target"] # Get the semantic distance to the target
+            c = data.paths_unfinished.loc[i,"clicks_to_target"]
+            if d < 0.1 or c<2:
+                abandon_reason = "target_reached" # If the semantic distance is low, or article is less than two clicks away, the player may consider the target as reached
             elif d >0.9:
-                abandon_reason = "target_far"
+                abandon_reason = "target_far" # If the semantic distance is high, the player may consider the target as too far and abandon the game
         data.paths_unfinished.loc[i,"abandon_reason"] = abandon_reason
