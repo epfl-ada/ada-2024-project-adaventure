@@ -88,66 +88,89 @@ def load_fork_matrix(data, df_hubs):
             total_comparisons += 1
 
     # Display the results
-    print(f"Total comparisons made: {total_comparisons}")
-    print(f"Paths with higher PageRank alternatives: {higher_pagerank_count}")
+    print(f"Total choices made: {total_comparisons}")
+    print(f"Choices with higher PageRank alternatives: {higher_pagerank_count}")
     print(f"Percentage: {(higher_pagerank_count / total_comparisons) * 100:.2f}%")
     return matrix1, matrix2, unused_links, article_names
 
 
-def plot_badChoices(matrix1, unused_links, article_names):
+def plot_badChoices(matrix_forgone, unused_links, article_names, df_hubs, data):
 
-    # Sum up the columns of matrix1
-    column_sums_m1 = np.array([np.sum(col[col > 0]) for col in (matrix1).T])
-    column_sums_ul = np.array([np.sum(col[col > 0]) for col in (unused_links).T])
-    column_sums = np.where(column_sums_ul > 10, column_sums_m1 / column_sums_ul, np.nan)
-    print(len(column_sums))
-    non_zero_column_sums_count = np.count_nonzero(column_sums)
-    print(f"Number of non-zero values in column_sums: {non_zero_column_sums_count}")
-    # Plot the distribution of the column sums as a barplot with 200 bins
-    plt.figure(figsize=(10, 6))
-    sns.histplot(column_sums, bins=40, color='purple', label='Column Sums Distribution', kde=False)
-    plt.xlabel('Share of forgoing the more central link')
-    plt.ylabel('Count')
-    plt.title('Distribution of Column Sums of Matrix1 / Used Links')
-    plt.legend()
+    # sum up the columns per article
+    column_sums_forgone = np.array([np.sum(col[col > 0]) for col in (matrix_forgone).T])
+    column_sums_unused = np.array([np.sum(col[col > 0]) for col in (unused_links).T])
+    column_sums = np.where(column_sums_unused > 10, column_sums_forgone / column_sums_unused, np.nan)
+    
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    sns.histplot(data=column_sums, bins=40, kde=False, color="#0f4584", alpha=1, ax=ax)
+    ax.set_title('Distribution of suboptimal choices')
+    ax.set_xlabel('Share of forgoing the more central link per article')
+    ax.set_ylabel('Amount of articles')
+    ax.set_yscale('log')
+    ax.grid(True, axis='y', color='white', linestyle='-', linewidth=0.5)
     plt.show()
+    
 
-    # Filter articles with column sums above 0.5
-    print(len(column_sums))
+    # filter out only those articles that have been an option more than once 
     forgone_indices = np.where((1 > column_sums))[0]
-
-    # Create a DataFrame to associate articles with their forgone values and column sums ul
     forgone_articles_df = pd.DataFrame({
         'Article': [article_names[i] for i in forgone_indices],
         'Forgone Value': [column_sums[i] for i in forgone_indices],
-        'Column Sums UL': [column_sums_ul[i] for i in forgone_indices]
+        'Column Sums UL': [column_sums_unused[i] for i in forgone_indices]
     })
 
-    # Sort by forgone value in descending order and get the top 100 articles
+    # sort descending and print
     top_forgone_articles = forgone_articles_df.sort_values(by='Forgone Value', ascending=False)
+    print('The articles that are forgone the most are:')
     print(top_forgone_articles.head(20))
-    return top_forgone_articles, column_sums
 
+    # merge into df_hubs
+    df_hubs = df_hubs.merge(forgone_articles_df[['Article', 'Column Sums UL', 'Forgone Value']], left_on='article_names', right_on='Article', how='left')
+    df_hubs.drop(columns=['Article'], inplace=True)
+    # add the first category to the df_hubs
+    df_hubs = df_hubs.merge(right= data.categories[['article_name', '1st cat']], 
+                                    how= 'left',
+                                    left_on='article_names',
+                                    right_on='article_name').drop(columns=['article_name'])
+    
+    return df_hubs, top_forgone_articles
 
-# Function to create an interactive scatter plot
-def plot_forgone_vs_usage(forgone_df, title='Forgone Value vs Column Sums UL'):
-    # Create the interactive scatter plot with Plotly
+def plot_hubScoreVSforgone(df_hubs, category=None):
+    # Ignore NaN and choices that appear less than x times
+    df_hubs = df_hubs.dropna(subset=['hub_score', 'Forgone Value'])
+    df_hubs = df_hubs[df_hubs['Column Sums UL'] >= 50]
+    
+    # color according to category
+    categories = ['Science', 'Geography', 'Countries', 'History', 'People', 'Religion', 'Citizenship', 'Everyday life',
+             'Design and Technology', 'Language and literature', 'IT', 'Business Studies', 'Music', 'Mathematics', 'Art']
+    color = '1st cat'
+    category_orders = {'1st cat': categories}
+    
     fig = px.scatter(
-        forgone_df,
-        x='Column Sums UL',
+        df_hubs,
+        x='hub_score',
         y='Forgone Value',
-        text='Article',
-        hover_data=['Article', 'Forgone Value', 'Column Sums UL'],
-        title=title,
-        labels={'Forgone Value': 'Forgone Value', 'Column Sums UL': 'Number of Times Link Was Used'},
-    )
-
-    # Customize marker size and opacity
-    fig.update_traces(marker=dict(size=8, opacity=0.7), textposition='top center')
-
-    # Add axis lines for better context
-    fig.add_vline(x=forgone_df['Column Sums UL'].mean(), line_dash="dash", line_color="red", annotation_text="Mean UL")
-    fig.add_hline(y=forgone_df['Forgone Value'].mean(), line_dash="dash", line_color="red", annotation_text="Mean Forgone")
-
-    # Show the plot
+        color=color,
+        category_orders=category_orders,
+        hover_data=['article_names', 'Forgone Value', 'Column Sums UL'],
+        log_x=True,
+        log_y=True,
+        title='User Frequency vs PageRank Score',
+        labels={'Forgone Value': 'Forgone percentage', 'Column Sums UL': 'Number of Times Link Was Available'},
+        )
+    
+    fig.update_layout(plot_bgcolor="#ebeaf2")
+    fig.update_traces(marker=dict(size=4, opacity=1))
+    
+    # fig.update_xaxes(range=[0.00001, 0.01])
+    # fig.update_yaxes(range=[0.002, 0.6])
+    
+    # save plot as html
+    if category is None:
+        fig.write_html("hubscore_vs_forgone.html", config={"displayModeBar": False})
+    else:
+        fig.write_html(f"hubscore_vs_forgone{category}.html", config={"displayModeBar": False})
+    
     fig.show()
+

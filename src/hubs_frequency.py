@@ -14,9 +14,9 @@ def get_hub_positions(data, df_hubs):
     shortest_paths = shortest_paths['shortest_paths']
     shortest_paths = shortest_paths.apply(ast.literal_eval)
     shortest_paths = [path_[0] for path_ in shortest_paths]
-
-    upper_10_percent = np.percentile(df_hubs["pagerank_hub_score_percent"], 85)
-    df_hubs['is_hub'] = df_hubs['pagerank_hub_score_percent'] > upper_10_percent  # Define hub threshold
+    
+    upper_10_percent = np.nanpercentile(df_hubs["hub_score"], 90)
+    df_hubs['is_hub'] = df_hubs['hub_score'] > upper_10_percent  # Define hub threshold
     print(len(df_hubs), 'hubs found', sum(df_hubs['is_hub']))
 
     finished_hub_positions = np.zeros(max(len(path) for path in finished_paths)-1)
@@ -51,7 +51,7 @@ def get_hub_positions(data, df_hubs):
 
 def plot_hub_positions(df_hubs, finished_hub_positions, unfinished_hub_positions, shortest_hub_positions):
     # Plot the results
-    print(np.percentile(df_hubs["pagerank_hub_score_percent"], 95))
+    print(np.percentile(df_hubs["hub_score"], 95))
     plt.figure(figsize=(12, 6))
     plt.plot(range(1, len(finished_hub_positions) + 1), finished_hub_positions, label='Finished Games', color='green')
     plt.plot(range(1, len(unfinished_hub_positions) + 1), unfinished_hub_positions, label='Unfinished Games', color='red')
@@ -66,3 +66,4 @@ def plot_hub_positions(df_hubs, finished_hub_positions, unfinished_hub_positions
     plt.legend()
     plt.grid(True)
     plt.show()
+
