@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from scipy.stats import pearsonr
+import networkx as nx
 
 def get_hubs_dataframe(data):
     '''
@@ -62,3 +63,80 @@ def calculate_correlation(df, cols):
                 correlation_matrix[i,j] = corr
 
     return p_values,correlation_matrix
+
+def calculate_pagerank(data, df_hubs):
+    """
+    Calculate standard PageRank scores and add them to the df_hubs DataFrame.
+
+    Args:
+    - data: A data object containing 'links' with '1st article' and '2nd article'
+    - df_hubs: A pandas DF with 'article_names' column
+
+    Returns:
+    - Updated df_hubs DataFrame with 'pagerank_score' column.
+    """
+    # Create graph
+    G = nx.DiGraph()
+
+    # Add edges from the links data
+    edges = list(zip(data.links['1st article'], data.links['2nd article']))
+    G.add_edges_from(edges)
+
+    # Calculate PageRank
+    pagerank_scores = nx.pagerank(G)
+
+    # Add PageRank scores to df_hubs
+    df_hubs["pagerank_score"] = df_hubs["article_names"].map(pagerank_scores).fillna(0)
+
+    return df_hubs
+
+def calculate_outgoing_pagerank(data, df_hubs):
+    """
+    Calculate custom PageRank scores biased toward hubs and add them to the df_hubs DataFrame.
+
+    Args:
+    - data: A data object containing 'links' with '1st article' and '2nd article'
+    - df_hubs: A pandas DF with 'article_names' column
+
+    Returns:
+    - Updated df_hubs DF with 'pagerank_outgoing_score' column
+    """
+    # Create graph
+    G = nx.DiGraph()
+
+    # Add edges from the 'links' data
+    edges = list(zip(data.links['1st article'], data.links['2nd article']))
+    G.add_edges_from(edges)
+
+    # Add weights based on out-degree
+    for node in G.nodes:
+        G.nodes[node]['out_degree'] = G.out_degree(node)
+
+    # Custom PageRank calculation, biased toward hubs
+    personalization = {node: G.nodes[node]['out_degree'] for node in G.nodes}
+    pagerank_scores = nx.pagerank(G, personalization=personalization)
+
+    # Add the scores back to df_hubs
+    df_hubs["pagerank_outgoing_score"] = df_hubs["article_names"].map(pagerank_scores).fillna(0)
+
+    return df_hubs
+
+def create_hub_score(df_hubs):
+    """
+    Calculate average of the other two hub scores to balance incoming and outgoing links
+
+    Args: 
+    - df_hubs: A pandas DF with 'pagerank_score' and 'pagerank_outgoing_score'
+
+    Returns:
+    - df_hubs with 'hub_score' column
+     - df_filtered_hubs: Filtered DataFrame where 'target_counts' > 0.
+    """
+    df_hubs['hub_score'] = df_hubs.apply(
+    lambda row: (row['pagerank_score'] + row['pagerank_outgoing_score']) / 2
+    if row['target_counts'] > 0 else None,
+    axis=1)
+
+    df_filtered_hubs = df_hubs[df_hubs['target_counts'] > 0].copy()
+
+    return df_hubs, df_filtered_hubs
