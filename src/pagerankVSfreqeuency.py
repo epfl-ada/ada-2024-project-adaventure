@@ -44,7 +44,7 @@ def get_pageVSfreq_data(data, df_hubs):
 
 
 def plot_pageVSfreq(freVpr, category= None):
-
+    # Decide what data should be in the plot
     if category is not None:
         freVpr = freVpr[freVpr['Category'] == category]
         categ = freVpr[freVpr['Category'] == category]['Under Category'].unique().tolist()
@@ -60,19 +60,35 @@ def plot_pageVSfreq(freVpr, category= None):
         
     categ
     # Create and plot interactive scatter plot 
-    fig = px.scatter(
-        freVpr,
-        x='pagerank_score',
-        y='user_freq',
-        plot_bgcolor="#ebeaf2",
-        color=color,
-        category_orders=category_orders, 
-        hover_data=['article_name'], 
-        log_x=True, 
-        log_y=True,  
-        title='User Frequency vs PageRank Score',
-        labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
-    )
+    if category is not None:
+        fig = px.scatter(
+            freVpr,
+            x='pagerank_score',
+            y='user_freq',
+            plot_bgcolor="#ebeaf2",
+            color=color,
+            category_orders=category_orders, 
+            hover_data=['article_name'], 
+            log_x=True, 
+            log_y=True,  
+            title='User Frequency vs PageRank Score' + category,
+            labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
+        )
+    else: 
+        fig = px.scatter(
+            freVpr,
+            x='pagerank_score',
+            y='user_freq',
+            plot_bgcolor="#ebeaf2",
+            color=color,
+            category_orders=category_orders, 
+            hover_data=['article_name'], 
+            log_x=True, 
+            log_y=True,  
+            title='User Frequency vs PageRank Score',
+            labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
+        )
+
     fig.add_vline(x=freVpr['pagerank_score'].mean(), line_dash="dash", line_color="red")
     fig.add_hline(y=freVpr['user_freq'].mean(), line_dash="dash", line_color="red")
     fig.update_traces(marker=dict(size=4, opacity=1))
@@ -88,7 +104,7 @@ def plot_pageVSfreq(freVpr, category= None):
 
 def plot_pageVSfreq_static(freVpr, category=None):
     # Set Seaborn style
-    sns.set(style="whitegrid")
+    sns.set_theme(style="whitegrid")
     plt.figure(figsize=(12, 8))
     
     # Filter data if a category is provided
@@ -100,14 +116,12 @@ def plot_pageVSfreq_static(freVpr, category=None):
         color_col = 'Category'
         unique_categories = freVpr['Category'].unique()
     
-    # Generate a color palette with enough unique colors
+    # Generate a color palette
     num_colors = len(unique_categories)
-    palette = sns.color_palette("tab20", num_colors)  # Use 'tab20' or another large palette
-    
-    # Create a dictionary to map each category to a color
+    palette = sns.color_palette("tab20", num_colors)
     color_mapping = dict(zip(unique_categories, palette))
     
-    # Create a scatter plot with log scales
+    # Create a log scaled scatter plot 
     ax = sns.scatterplot(
         data=freVpr,
         x='pagerank_score',
@@ -115,28 +129,27 @@ def plot_pageVSfreq_static(freVpr, category=None):
         hue=color_col,
         palette=color_mapping,
         legend='full',
-        s=40,  # Marker size
-        alpha=0.7  # Marker transparency
+        s=40, 
+        alpha=0.7  
     )
     
     # Plot vertical and horizontal lines for the means
     plt.axvline(freVpr['pagerank_score'].mean(), color='red', linestyle='--', linewidth=1)
     plt.axhline(freVpr['user_freq'].mean(), color='red', linestyle='--', linewidth=1)
     
-    # Set log scales for both axes
+    # Set log scales
     ax.set_xscale('log')
     ax.set_yscale('log')
     
-    # Axis labels and title
+    # Adds axis labels, title, legends and sets limits on axis
     plt.xlabel('PageRank Score', fontsize=14)
     plt.ylabel('User Frequency', fontsize=14)
-    plt.title('User Frequency vs PageRank Score', fontsize=16)
-    
-    # Set x and y limits
+    if category is not None:
+        plt.title('User Frequency vs PageRank Score: ' + category, fontsize=16)
+    else: 
+        plt.title('User Frequency vs PageRank Score ', fontsize=16)
     plt.xlim([10**-4.5, 10**-2])
     plt.ylim([10**2, 10**5.7])
-    
-    # Add a legend
     plt.legend(title=color_col, bbox_to_anchor=(1.05, 1), loc='upper left')
     
     # Show the plot
