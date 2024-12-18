@@ -20,7 +20,7 @@ def get_pageVSfreq_data(data, df_hubs):
     article_fre = pd.concat([pf_article_fre, pu_article_fre], 
                             ignore_index=True).value_counts().to_frame().reset_index()
 
-    # Merge to also geat pagerank score and category for each article
+    # Merge to also get pagerank score and category for each article
     freVpr = article_fre.merge(right= df_hubs[['article_names', 'pagerank_score']], 
                                 how= 'left',
                                 left_on='path', 
@@ -65,13 +65,12 @@ def plot_pageVSfreq(freVpr, category= None):
             freVpr,
             x='pagerank_score',
             y='user_freq',
-            plot_bgcolor="#ebeaf2",
             color=color,
             category_orders=category_orders, 
             hover_data=['article_name'], 
             log_x=True, 
             log_y=True,  
-            title='User Frequency vs PageRank Score' + category,
+            title='User Frequency vs PageRank Score: ' + category,
             labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
         )
     else: 
@@ -79,7 +78,6 @@ def plot_pageVSfreq(freVpr, category= None):
             freVpr,
             x='pagerank_score',
             y='user_freq',
-            plot_bgcolor="#ebeaf2",
             color=color,
             category_orders=category_orders, 
             hover_data=['article_name'], 
@@ -103,7 +101,7 @@ def plot_pageVSfreq(freVpr, category= None):
     fig.show()
 
 def plot_pageVSfreq_static(freVpr, category=None):
-    # Set Seaborn style
+    # Set theme for plot
     sns.set_theme(style="whitegrid")
     plt.figure(figsize=(12, 8))
     
@@ -141,7 +139,7 @@ def plot_pageVSfreq_static(freVpr, category=None):
     ax.set_xscale('log')
     ax.set_yscale('log')
     
-    # Adds axis labels, title, legends and sets limits on axis
+    # Add axis labels, title, legends and sets limits on axis
     plt.xlabel('PageRank Score', fontsize=14)
     plt.ylabel('User Frequency', fontsize=14)
     if category is not None:
@@ -156,28 +154,39 @@ def plot_pageVSfreq_static(freVpr, category=None):
     plt.show()
 
 def get_quadrant_views(freVpr):
-    # Adds views from metadata to freVpr
+    # Add views from metadata to freVpr
     metadata = pd.read_csv('data/metadata.csv')
     freVpr = freVpr.merge(right=metadata[['article_name', 'views']], how='left', on='article_name')
 
-    # Calculates boundary for each
-    mean_ps = freVpr['pagerank_score'].mean()
-    mean_uf = freVpr['user_freq'].mean()
+    # Max min normalises the data
+    freVpr_normalised = freVpr.copy(deep=True)
+    freVpr_normalised['pagerank_score'] = (freVpr_normalised['pagerank_score'] - freVpr_normalised['pagerank_score'].min()) / (freVpr_normalised['pagerank_score'].max() - freVpr_normalised['pagerank_score'].min())
+    freVpr_normalised['user_freq'] = (freVpr_normalised['user_freq'] - freVpr_normalised['user_freq'].min()) / (freVpr_normalised['user_freq'].max() - freVpr_normalised['user_freq'].min())
+
+    # Calculate boundary for each
+    mean_ps = freVpr_normalised['pagerank_score'].mean()
+    mean_uf = freVpr_normalised['user_freq'].mean()
+
+    # Calculate the euclidean distance for each point to the mean
+    freVpr_normalised['dist_to_mean'] = np.sqrt((freVpr_normalised['pagerank_score'] - mean_ps)**2 + (freVpr_normalised['user_freq'] - mean_uf)**2)
 
     # Define what article belongs to what quadrant
     conditions = [
-        (freVpr['pagerank_score'] <= mean_ps) & (freVpr['user_freq'] <= mean_uf),
-        (freVpr['pagerank_score'] <= mean_ps) & (freVpr['user_freq'] >= mean_uf),
-        (freVpr['pagerank_score'] >= mean_ps) & (freVpr['user_freq'] <= mean_uf),
-        (freVpr['pagerank_score'] >= mean_ps) & (freVpr['user_freq'] >= mean_uf)]
+        (freVpr_normalised['pagerank_score'] <= mean_ps) & (freVpr_normalised['user_freq'] <= mean_uf),
+        (freVpr_normalised['pagerank_score'] <= mean_ps) & (freVpr_normalised['user_freq'] >= mean_uf),
+        (freVpr_normalised['pagerank_score'] >= mean_ps) & (freVpr_normalised['user_freq'] <= mean_uf),
+        (freVpr_normalised['pagerank_score'] >= mean_ps) & (freVpr_normalised['user_freq'] >= mean_uf)]
     categories = ['lower left', 'upper left', 'lower right', 'upper right']
 
     # Appoint corresponing quadrant to each article
-    freVpr['quadrant'] = np.select(conditions, categories)
+    freVpr_normalised['quadrant'] = np.select(conditions, categories)
 
-    # Calculates mean of the lower right and upper left quadrants
-    quadrant_data = freVpr.groupby(by='quadrant')['views'].mean().reset_index()
-    quadrant_data = quadrant_data[(quadrant_data['quadrant'] == 'upper left') | (quadrant_data['quadrant'] == 'lower right')]
+    # Keep the 10 biggest outliers in each quadrant
+    biggest_outliers = freVpr_normalised.groupby('quadrant', group_keys=False).apply(lambda x: x.nlargest(10, 'dist_to_mean'))
+
+    # Calculate mean of the lower right and upper left quadrants
+    quadrant_data = biggest_outliers.groupby(by='quadrant')['views'].mean().reset_index()
+    quadrant_data = quadrant_data[(quadrant_data['quadrant'] == 'lower right') | (quadrant_data['quadrant'] == 'upper left')]
 
     # Creates plot
     plt.figure(figsize=(10, 6)) 
@@ -185,7 +194,7 @@ def get_quadrant_views(freVpr):
     plt.grid(color='white', linewidth=1)
     ax = sns.barplot(data=quadrant_data, x='quadrant', y='views')
     ax.set_facecolor('#D3D3D3')  
-    plt.title('Average monthly views of articles in lower right and upper left quadrants', fontsize=16)
+    plt.title('Average monthly views of the biggest outliers', fontsize=16)
     plt.xlabel('Quadrant', fontsize=14)
     plt.ylabel('Average monthly views', fontsize=14)
 
