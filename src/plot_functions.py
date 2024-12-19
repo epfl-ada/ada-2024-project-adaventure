@@ -171,9 +171,9 @@ def barplot_page_score_by_category_normalized(df_filtered_hubs):
 
 
 def hub_network(df_hubs, G):
-    # Generate positions for articles in 3D space using a random distribution
+    # Random generation of positions for articles in 3D space
     num_nodes = len(G.nodes())
-    x_vals = np.random.uniform(-0.2, 0.2, num_nodes)  # size of space
+    x_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
     y_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
     z_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
 
@@ -201,7 +201,7 @@ def hub_network(df_hubs, G):
         hoverinfo='text'
     ))
 
-    # Update layout for better visualization
+    # Update layout for better visualization and display plot
     fig.update_layout(
         title='Interactive 3D Visualization of Articles by PageRank',
         scene=dict(
@@ -209,9 +209,40 @@ def hub_network(df_hubs, G):
             yaxis=dict(visible=False),
             zaxis=dict(visible=False)
         ),
-        paper_bgcolor='white',  # Blank background
+        paper_bgcolor='white',
         margin=dict(l=0, r=0, b=0, t=40)
     )
 
-    # Display the interactive plot
     fig.show()
+
+def static_hub_3d(df_hubs, G):
+    # Random generation of positions for articles in 3D space
+    num_nodes = len(G.nodes())
+    x_vals = np.random.uniform(-0.2, 0.2, num_nodes)
+    y_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
+    z_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
+
+    # Get hub scores and normalize them for point sizes
+    pagerank_scores = df_hubs.set_index("article_names")["hub_score"].to_dict()
+    sizes = [pagerank_scores.get(node, 0) * 3000 for node in G.nodes()] 
+    colors = [pagerank_scores.get(node, 0) for node in G.nodes()]  
+
+    # Creating scatter plot
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    scatter = ax.scatter(x_vals, y_vals, z_vals, c=colors, s=sizes, cmap='viridis', alpha=0.8)
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.5, aspect=10)
+    cbar.set_label('Hub score')
+
+    ax.set_title('3D Visualization of Articles by Hub score')
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.set_zlabel('')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_zticks([])
+
+    # Show plot
+    plt.tight_layout()
+    plt.show()
