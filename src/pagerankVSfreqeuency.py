@@ -86,7 +86,7 @@ def plot_pageVSfreq(freVpr, category= None):
             title='User Frequency vs PageRank Score',
             labels={'pagerank_score': 'PageRank Score', 'user_freq': 'User Frequency'}
         )
-
+        
     fig.add_vline(x=freVpr['pagerank_score'].mean(), line_dash="dash", line_color="red")
     fig.add_hline(y=freVpr['user_freq'].mean(), line_dash="dash", line_color="red")
     fig.update_traces(marker=dict(size=4, opacity=1))
@@ -158,6 +158,10 @@ def get_quadrant_views(freVpr):
     metadata = pd.read_csv('data/metadata.csv')
     freVpr = freVpr.merge(right=metadata[['article_name', 'views']], how='left', on='article_name')
 
+    # Calculates correlation that views has to pagerank score and user frequency
+    correlationPR = freVpr['pagerank_score'].corr(freVpr['views'], method='spearman')
+    correlationUF = freVpr['user_freq'].corr(freVpr['views'], method='spearman')
+
     # Max min normalises the data
     freVpr_normalised = freVpr.copy(deep=True)
     freVpr_normalised['pagerank_score'] = (freVpr_normalised['pagerank_score'] - freVpr_normalised['pagerank_score'].min()) / (freVpr_normalised['pagerank_score'].max() - freVpr_normalised['pagerank_score'].min())
@@ -182,7 +186,7 @@ def get_quadrant_views(freVpr):
     freVpr_normalised['quadrant'] = np.select(conditions, categories)
 
     # Keep the 10 biggest outliers in each quadrant
-    biggest_outliers = freVpr_normalised.groupby('quadrant', group_keys=False).apply(lambda x: x.nlargest(10, 'dist_to_mean'))
+    biggest_outliers = freVpr_normalised.groupby('quadrant', group_keys=False).apply(lambda x: x.nlargest(20, 'dist_to_mean'))
 
     # Calculate mean of the lower right and upper left quadrants
     quadrant_data = biggest_outliers.groupby(by='quadrant')['views'].mean().reset_index()
@@ -203,3 +207,8 @@ def get_quadrant_views(freVpr):
 
     # Plots the results
     plt.show()
+
+    print("Spearman correlation between amount of views and user frequency: ", correlationUF)
+    print("Spearman correlation between amount of views and pagerank score: ", correlationPR)
+
+    return
