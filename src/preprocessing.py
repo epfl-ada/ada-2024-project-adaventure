@@ -3,6 +3,10 @@ import numpy as np
 from urllib.parse import unquote
 
 class WikispeediaData:
+    """
+    This class loads and preprocesses the data for the analysis 
+
+    """
     def __init__(self):
         self.articles = pd.read_csv('data/wikispeedia_paths-and-graph/articles.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = [ 'article_name'])
         self.categories = pd.read_csv('data/wikispeedia_paths-and-graph/categories.tsv', sep='\t',comment='#', header = None, encoding="utf-8", names = ['article_name', 'category_name'])
@@ -12,7 +16,6 @@ class WikispeediaData:
         self.matrix = self.load_shortest_paths()
 
         self.preprocess()
-
 
 
     def load_shortest_paths(self):
