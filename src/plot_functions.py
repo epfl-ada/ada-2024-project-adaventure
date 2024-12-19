@@ -49,3 +49,31 @@ def plot_two_distributions(df, column_name1, column_name2, title1, title2,
 
     # Show the combined plot
     plt.show()
+
+
+def plot_top10_pagerank(df_filtered_hubs):
+    top_10_pr = df_filtered_hubs.sort_values(by="hub_score", ascending=False).head(10)
+    inverted_palette = sns.color_palette("Blues", n_colors=10)
+
+
+    #bar plot 
+    plt.figure(figsize=(10, 6))
+    bar_plt = sns.barplot(
+        data=top_10_pr,
+        y="article_names",
+        x="hub_score",
+        hue="hub_score",
+        palette= inverted_palette
+    )
+
+    # Add labels and title
+    plt.xlabel("PageRank Score", fontsize=12)
+    plt.ylabel("Article Names", fontsize=12)
+    plt.title("Top 10 Articles by PageRank Score", fontsize=14)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+
+    plt.legend().remove()
+    plt.tight_layout()
+    plt.savefig("top_page_rank_articles.png")
+    plt.show()
