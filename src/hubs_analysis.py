@@ -64,6 +64,29 @@ def calculate_correlation(df, cols):
 
     return p_values,correlation_matrix
 
+
+def get_top_10_largest(df, column, print_statement, n = 10):
+    '''
+    Function to print the n largest values of a column and returns set of the articles
+    '''
+    top_n = df.nlargest(n, column)[['article_names', column]]
+    print(print_statement)
+    print(top_n)
+
+    return set(top_n['article_names'])
+
+
+def get_top_10_smallest(df, column, print_statement, n = 10):
+    '''
+    Function to print the n smallest values of a column and returns set of the articles
+    '''
+    top_n = df.nsmallest(n, column)[['article_names', column]]
+    print(print_statement)
+    print(top_n)
+
+    return set(top_n['article_names'])
+
+
 def calculate_pagerank(data, df_hubs):
     """
     Calculate standard PageRank scores and add them to the df_hubs DataFrame.
