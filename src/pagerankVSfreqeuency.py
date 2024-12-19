@@ -102,7 +102,7 @@ def plot_pageVSfreq(freVpr, category= None):
 
 def plot_pageVSfreq_static(freVpr, category=None):
     # Set theme for plot
-    sns.set_theme(style="whitegrid")
+    sns.set_theme()
     plt.figure(figsize=(12, 8))
     
     # Filter data if a category is provided
@@ -183,7 +183,7 @@ def get_quadrant_views(freVpr):
     categories = ['lower left', 'upper left', 'lower right', 'upper right']
 
     # Appoint corresponing quadrant to each article
-    freVpr_normalised['quadrant'] = np.select(conditions, categories)
+    freVpr_normalised['quadrant'] = np.select(conditions, categories, default='no quadrant')
 
     # Keep the 10 biggest outliers in each quadrant
     biggest_outliers = freVpr_normalised.groupby('quadrant', group_keys=False).apply(lambda x: x.nlargest(20, 'dist_to_mean'))
@@ -192,23 +192,15 @@ def get_quadrant_views(freVpr):
     quadrant_data = biggest_outliers.groupby(by='quadrant')['views'].mean().reset_index()
     quadrant_data = quadrant_data[(quadrant_data['quadrant'] == 'lower right') | (quadrant_data['quadrant'] == 'upper left')]
 
-    # Creates plot
+    # Create and save plot
     plt.figure(figsize=(10, 6)) 
-    sns.set_theme(style="darkgrid") 
-    plt.grid(color='white', linewidth=1)
-    ax = sns.barplot(data=quadrant_data, x='quadrant', y='views')
-    ax.set_facecolor('#D3D3D3')  
+    sns.barplot(data=quadrant_data, x='quadrant', y='views', color="#0f4584")
     plt.title('Average monthly views of the biggest outliers', fontsize=16)
     plt.xlabel('Quadrant', fontsize=14)
     plt.ylabel('Average monthly views', fontsize=14)
 
-    # Saves image as png
     plt.savefig("views_per_quadrant.png", bbox_inches='tight', dpi=300)
-
-    # Plots the results
     plt.show()
 
     print("Spearman correlation between amount of views and user frequency: ", correlationUF)
     print("Spearman correlation between amount of views and pagerank score: ", correlationPR)
-
-    return

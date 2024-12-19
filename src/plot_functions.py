@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
-
-from src.hubs_analysis import calculate_correlation
+import plotly.graph_objects as go
 
 def plot_category_distribution(column, title):
     fig, ax = plt.subplots(1, figsize=(10, 6))
@@ -169,3 +168,50 @@ def barplot_page_score_by_category_normalized(df_filtered_hubs):
     plt.show()
 
     return matrix/number_articles.values
+
+
+def hub_network(df_hubs, G):
+    # Generate positions for articles in 3D space using a random distribution
+    num_nodes = len(G.nodes())
+    x_vals = np.random.uniform(-0.2, 0.2, num_nodes)  # size of space
+    y_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
+    z_vals = np.random.uniform(-0.2, 0.2, num_nodes)  
+
+    # Get PageRank scores and normalize them for point sizes
+    pagerank_scores = df_hubs.set_index("article_names")["hub_score"].to_dict()
+    sizes = [pagerank_scores.get(node, 0) * 3000 for node in G.nodes()] 
+    colors = [pagerank_scores.get(node, 0) for node in G.nodes()]  
+
+
+    # Create a Plotly 3D scatter plot
+    fig = go.Figure()
+    fig.add_trace(go.Scatter3d(
+        x=x_vals,
+        y=y_vals,
+        z=z_vals,
+        mode='markers',
+        marker=dict(
+            size=sizes,
+            color=colors,
+            colorscale='Viridis',
+            opacity=0.8,
+            colorbar=dict(title='PageRank Score')
+        ),
+        text=list(G.nodes()),  # Add node names for hover info
+        hoverinfo='text'
+    ))
+
+    # Update layout for better visualization
+    fig.update_layout(
+        title='Interactive 3D Visualization of Articles by PageRank',
+        scene=dict(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            zaxis=dict(visible=False)
+        ),
+        paper_bgcolor='white',  # Blank background
+        margin=dict(l=0, r=0, b=0, t=40)
+    )
+
+    # Display the interactive plot
+    fig.show()

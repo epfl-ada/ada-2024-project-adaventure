@@ -142,7 +142,7 @@ def calculate_outgoing_pagerank(data, df_hubs):
     # Add the scores back to df_hubs
     df_hubs["pagerank_outgoing_score"] = df_hubs["article_names"].map(pagerank_scores).fillna(0)
 
-    return df_hubs
+    return df_hubs, G
 
 def create_hub_score(df_hubs):
     """
