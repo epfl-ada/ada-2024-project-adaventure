@@ -1,17 +1,20 @@
 # ADA Project Milestone 2
-Below is an outline of the requirements for the Readme.md file and information on the deliverables for P2.
 
 ## Title: Wikispeedi-Know - Hubs, User Patterns, and How They Show a Common Knowledge Gap
 
+https://madhueb.github.io/website/
+
+
 ### Abstract 
-Our project uses Wikispeedia to explore the structure and gaps in our society's "common knowledge" by analyzing both popular articles and hub articles. We aim to understand which subjects are most commonly recognized, how players navigate between them, and where knowledge gaps may exist. By identifying highly visited articles and hubs (articles with many links) - we can analyze popular knowledge compared to specialized knowledge. Additionally, exploring common links in successful paths with unfinished paths will further help us understand public knowledge gaps. Finally, we compare hubs and user navigation patterns to determine whether hubs improve path efficiency or if users bypass them in favor of more accessible articles. Through these analyses, we hope to reveal insights into shared knowledge, intuitive navigation patterns, and the cultural biases embedded in these patterns.
+Wikipedia, the largest reference work ever created, is an online encyclopedia where anyone can contribute to collaboratively written articles. Its interconnected structure makes it an ideal platform to study navigation and human associations through games like Wikispeedia (play here). In this game, players navigate from one article to another using only hyperlinks, aiming to minimize the number of clicks. This project explores two central themes: the role of hubs—highly connected articles—and user navigation patterns. By analyzing the characteristics and usage of hubs, common and abandoned paths, and more, we provide insights into how Wikipedia’s structure influences player strategies and efficiency. Our findings aim to learn something about common knowledge, user patterns, and the interplay between structure and strategy.
+
 
 ### Research Questions <br>
 We have split our research questions into 3 key areas: <br>
 1. #### Hubs <br>
 * Which articles serve as the largest hubs on Wikispeedia, and how frequently are they used by players? <br>
 * How well do hubs facilitate movement through the network—do they lead to faster, more efficient paths to target articles? <br> 
-* What types of information are most often contained within hubs, and how are these hubs related to other articles or subject categories? <br> 
+* What types of information are most often contained within hubs? <br> 
 
 2. #### User Navigation Patterns <br>
 * What paths are most commonly taken by players, and what does this reveal about public knowledge and associations? <br>
