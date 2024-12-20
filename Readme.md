@@ -2,7 +2,7 @@
 
 ## Title: Wikispeedi-Know - Hubs, User Patterns, and How They Show a Common Knowledge Gap
 
-https://madhueb.github.io/website/
+Link to data story: https://madhueb.github.io/website/
 
 
 ### Abstract 
