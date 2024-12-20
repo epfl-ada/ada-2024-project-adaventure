@@ -12,20 +12,19 @@ Wikipedia, the largest reference work ever created, is an online encyclopedia wh
 ### Research Questions <br>
 We have split our research questions into 3 key areas: <br>
 1. #### Hubs <br>
-* Which articles serve as the largest hubs on Wikispeedia, and how frequently are they used by players? <br>
-* How well do hubs facilitate movement through the network—do they lead to faster, more efficient paths to target articles? <br> 
-* What types of information are most often contained within hubs? <br> 
+* What are the defining characteristics of a hub?
+* Which articles serve as the largest hubs on Wikispeedia, and how frequently are they used by players?
+* What types of information are most often contained within hubs, and how are the hubs related to other articles or subject categories?
 
 2. #### User Navigation Patterns <br>
-* What paths are most commonly taken by players, and what does this reveal about public knowledge and associations? <br>
-* Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths? <br>
-* How do common paths differ from lesser-used or “unintuitive” paths between the same articles? <br>
+* What paths are most commonly taken by players, and what does this reveal about public knowledge and associations?
+* Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths?
+* How do common paths differ from lesser-used or “unintuitive” paths between the same articles?
 
 3. #### Comparing Hubs and User Navigation Patterns
-* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks? <br>
-* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles? <br> 
-### Additional dataset (if any)
-We are not planning on using any additional datasets. 
+* Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
+* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
+* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
 
 ### Methods and Timeline
 #### Task 1: Data Preparation and Cleaning 
