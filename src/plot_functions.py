@@ -118,7 +118,7 @@ def plot_page_score_categories(df_filtered_hubs):
     plt.title('Sum of PageRank score Score by Category in percent')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
-    plt.savefig("sum_pagerank_hub_score_percent.png")
+    plt.savefig("images/png/sum_pagerank_hub_score_percent.png")
     plt.show()
 
 def barplot_page_score_by_category(df_filtered_hubs):
@@ -141,7 +141,7 @@ def barplot_page_score_by_category(df_filtered_hubs):
     plt.xticks(rotation=45, ha='right')
 
     plt.tight_layout()
-    plt.savefig("sum_pagerank_hub_score_percent_barchart.png")
+    plt.savefig("images/png/sum_pagerank_hub_score_percent_barchart.png")
     plt.show()
 
 def barplot_page_score_by_category_normalized(df_filtered_hubs):
@@ -165,7 +165,7 @@ def barplot_page_score_by_category_normalized(df_filtered_hubs):
     plt.xticks(rotation=45, ha='right')
 
     plt.tight_layout()
-    plt.savefig("sum_pagerank_hub_score_percent_barchart.png")
+    plt.savefig("images/png/sum_pagerank_hub_score_percent_barchart.png")
     plt.show()
 
     return matrix/number_articles.values

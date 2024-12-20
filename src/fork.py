@@ -156,11 +156,11 @@ def plot_hubScoreVSforgone(df_hubs, category=None):
         hover_data=['article_names', 'Forgone Value', 'Column Sums UL'],
         log_x=True,
         log_y=True,
-        title='User Frequency vs PageRank Score',
+        title='Forgone percentage vs PageRank',
         labels={'Forgone Value': 'Forgone percentage', 'Column Sums UL': 'Number of Times Link Was Available'},
         )
     
-    fig.update_layout(plot_bgcolor="#ebeaf2")
+    fig.update_layout(plot_bgcolor="#ebeaf2", xaxis_title="PageRank")
     fig.update_traces(marker=dict(size=4, opacity=1))
     
     # fig.update_xaxes(range=[0.00001, 0.01])
