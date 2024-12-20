@@ -14,12 +14,11 @@ We have split our research questions into 3 key areas: <br>
 2. #### User Navigation Patterns <br>
 * What paths are most commonly taken by players, and what does this reveal about public knowledge and associations?
 * Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths?
-* How do common paths differ from lesser-used or “unintuitive” paths between the same articles?
+* Do users exhibit similar behaviors when navigating Wikipedia’s network?
 
 3. #### Comparing Hubs and User Navigation Patterns
-* Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
-* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
-* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
+* To what extent does the reliance on hubs obscure the identification of common knowledge?
+* Is it possible to identify common knowledge in a navigational context despite the influence of network structure?
 
 ### File Structure
 **`analysis.ipynb/`**: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
@@ -31,6 +30,9 @@ We have split our research questions into 3 key areas: <br>
 **`images/`**: Contains images for the data story, organized into two subfolders:
 - **`html/`**: Includes HTML figures generated for the project.
 - **`png/`**: Includes PNG figures generated for the project.
+
+### External data
+* In order to validate the results in part 3 an external dataset of monthly visits to Wikipedia articles was gathered using the Wikimedia api.
 
 ### Organization within the team 
 * Michelle:
@@ -48,3 +50,19 @@ We have split our research questions into 3 key areas: <br>
 * Madeleine : 
   * Analysed user navigation patterns 
   * Worked on data story
+ 
+  
+ 
+### Original Research Questions
+The final research questions for part 3 were slightly altered from the original ones. The reason being that further analysis showed the original ones asked questions that were a bit too difficult to answer with the given data. The original research questions for part 3 can be seen below.
+
+3. #### Comparing Hubs and User Navigation Patterns
+* Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
+* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
+* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
+
+### Citations
+
+* Nils Reimers, Iryna Gurevych. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. arXiv. https://arxiv.org/abs/ArticleID
+* L. Page, S. Brin, R. Motwani, and T. Winograd. (1999). The PageRank Citation Ranking: Bringing Order to the Web.  Stanford InfoLab. http://ilpubs.stanford.edu:8090/422/
+
