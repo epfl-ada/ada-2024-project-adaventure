@@ -25,11 +25,16 @@ We have split our research questions into 3 key areas: <br>
 * How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
 * Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
 
-### File Structure
-**analysis.ipynb:** The main code for analysis contained in the data story is located here. This Jupyter notebook contains the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.\
-**src/:** Contains additional Python scripts supporting the analysis. You can find data processing scripts, and other components necessary for running the full analysis.
-**data/**: The data folder contains the data used during the project
-**images/** The images folder contains images for the data story divided into two sub folder html for html figures generated and png for png figures generated
+File Structure
+**`analysis.ipynb/`**:: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
+
+**`src/`**:: Contains additional Python scripts that support the analysis. This folder includes data processing scripts and other components necessary for running the full analysis.
+
+**`data/`**:: Stores the data used throughout the project.
+
+**`images/`**:: Contains images for the data story, organized into two subfolders:
+- **`html/`**:: Includes HTML figures generated for the project.
+- **`png/`**:: Includes PNG figures generated for the project.
 
 ### Organization within the team 
 * Michelle:
