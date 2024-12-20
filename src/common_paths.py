@@ -155,6 +155,9 @@ def get_most_visited_categories(data,cat_type = "1st cat"):
 
 ########################################## PLOT FUNCTIONS ##################################
 def plot_top10_articles(data):
+    """
+    Function to plot the top 10 most visited articles
+    """
     dict_articles = get_most_visited_articles(data)
     top_10 = sorted(dict_articles.items(), key=lambda x: x[1], reverse=True)[:10]
     articles, visits = zip(*top_10)
@@ -184,6 +187,9 @@ def plot_top10_articles(data):
 
 
 def plot_top10_links(data):
+    """
+    Function to plot the top 10 most visited links
+    """
     dict_links = get_paths_oflength_k(data, 2)
     top_10 = sorted(dict_links.items(), key=lambda x: x[1], reverse=True)[:10]
     top_10 = {f"{k[0]} -> {k[1]}": v for k, v in top_10}
@@ -199,6 +205,9 @@ def plot_top10_links(data):
     plt.show()
 
 def fig_top_cat(data):
+    """
+    Function to plot the wordcloud for categories 
+    """
     dict_categories = get_most_visited_categories(data, "1st cat")
     wordcloud = WordCloud(
         width=800,

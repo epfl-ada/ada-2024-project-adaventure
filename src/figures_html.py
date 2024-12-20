@@ -31,7 +31,7 @@ def fig_Heatmap_bert(data):
         zmax=1,
         xaxis='x',  
         yaxis='y',  
-        hovertemplate='1st Path: %{x}<br>2nd Path: %{y}<br>Distance: %{z}<extra></extra>'  # Formatage de l'infobulle
+        hovertemplate='1st Path: %{x}<br>2nd Path: %{y}<br>Distance: %{z}<extra></extra>'  
 
     ))
 
@@ -70,58 +70,6 @@ def fig_Heatmap_bert(data):
     fig.show(config={"displayModeBar": False})
 
 
-def fig_Heatmap_bert_random(data):
-
-    matrix_sim = get_sim_matrix_random(data,distance_Bert)
-    mean = np.mean(matrix_sim)
-    print("Mean distance : ",mean)
-
-    # Create heatnmap
-    fig = go.Figure(data=go.Heatmap(
-        z=matrix_sim,
-        colorscale='Blues',  
-        colorbar=dict(title="Distance"),
-        zmin=0,  
-        zmax=1,
-        xaxis='x',  
-        yaxis='y',  
-        hovertemplate='1st Path: %{x}<br>2nd Path: %{y}<br>Distance: %{z}<extra></extra>'  # Formatage de l'infobulle
-
-    ))
-
-    fig.update_layout(
-        title='Semantic distance for 39 random paths',
-        title_font=dict(
-            size=15  
-        ),
-        title_x=0.5,  
-        title_xanchor='center',  
-        xaxis=dict(
-            title='1st path',
-            tickmode='linear',
-            ticks='outside',
-            ticklen=5,
-            showgrid=False  
-        ),
-        yaxis=dict(
-            title='2nd path',
-            tickmode='linear',
-            ticks='outside',
-            ticklen=5,
-            showgrid=False  
-        ),
-        width=650,  
-        height=600, 
-        margin=dict(l=20, r=20, t=60, b=40)  
-    )
-    fig.layout.xaxis.fixedrange = True
-    fig.layout.yaxis.fixedrange = True
-
-    # Save heatmap as HTML
-    fig.write_html('heatmap_distance.html',config={"displayModeBar": False})
-
-
-    fig.show(config={"displayModeBar": False})
 
 def fig_top10_articles(data):
     dict_articles = get_most_visited_articles(data)
@@ -167,32 +115,28 @@ def fig_top10_links(data):
     top_10 = sorted(dict_links.items(), key=lambda x: x[1], reverse=True)[:10]
     top_10 = {f"{k[0]} -> {k[1]}": v for k, v in top_10}
     articles, visits = zip(*top_10.items())
-    # Créer un graphique en barres
     fig = go.Figure(go.Bar(
-        y=articles,    # Noms des articles (axe Y)
-        x=visits,      # Nombre de visites (axe X)
-        orientation='h',  # Orientation des barres horizontales
-        marker=dict(color='royalblue'),
-        text=visits,   # Afficher les valeurs sur les barres
-        textposition='auto',  # Positionner les valeurs sur les barres
+        y=articles,    
+        x=visits,      
+        orientation='h',  
+        marker=dict(color='darkblue'),
+        text=visits,   
+        textposition='auto', 
     ))
 
-    # Ajouter des détails à la figure
     fig.update_layout(
         title="Top 10 most visited links",
-        title_x=0.5,  # Centrer le titre
+        title_x=0.5, 
         xaxis_title="Number of visits during games",
         yaxis_title="Link",
-        template="plotly_white",  # Choisir un joli template (ex: plotly_dark)
+        template="plotly_white",  
         showlegend=False
     )
     fig.layout.xaxis.fixedrange = True
     fig.layout.yaxis.fixedrange = True
 
-    # Sauvegarder la figure en HTML
     fig.write_html("top_10_links_visites.html",config={"displayModeBar": False})
 
-    # Afficher la figure
     fig.show(config={"displayModeBar": False})
 
 

@@ -6,8 +6,6 @@ from scipy.spatial.distance import cosine
 from collections import Counter
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib.sankey import Sankey
-import plotly.graph_objects as go
 
 
 
@@ -284,6 +282,9 @@ def fig_to_target(data):
 
 
 def bar_plot_connections(data):
+    """
+    Plot the unseen connections between categories
+    """
     dict_pairs = get_stoptarget(data)
     dict_common = {k: v for k, v in dict_pairs.items() if v >= 10}
     dict_c = {}

@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from urllib.parse import unquote
 import numpy as np
-import os
-import pprint
-import random
 import math
 import seaborn as sns
 
