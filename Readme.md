@@ -1,9 +1,5 @@
-# ADA Project Milestone 2
-
-## Title: Wikispeedi-Know - Hubs, User Patterns, and How They Show a Common Knowledge Gap
-
-### Data Story
-You can explore the data story and its findings by visiting this link to the data story.
+# Wikispeedi-Know - Hubs, User Patterns, and How They Show a Common Knowledge Gap
+You can explore the data story and its findings by visiting this [link]((https://madhueb.github.io/website/))to the data story. 
 
 ### Abstract
 Wikipedia, the largest reference work ever created, is an online encyclopedia where anyone can contribute to collaboratively written articles. Its interconnected structure makes it an ideal platform to study navigation and human associations through games like Wikispeedia (play here). In this game, players navigate from one article to another using only hyperlinks, aiming to minimize the number of clicks. This project explores two central themes: the role of hubs—highly connected articles—and user navigation patterns. By analyzing the characteristics and usage of hubs, common and abandoned paths, and more, we provide insights into how Wikipedia’s structure influences player strategies and efficiency. Our findings aim to learn something about common knowledge, user patterns, and the interplay between structure and strategy.
