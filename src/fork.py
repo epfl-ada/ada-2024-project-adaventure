@@ -4,27 +4,35 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-def load_fork_matrix(data, df_hubs):
+def load_overlooked_score(data, df_hubs):
+    '''we calculate a score showing how often any one article is overlooked by a player
+    despite having a <= distance to the target and having a better PR score
+    
+    Returns:
+        the hubs dataframe updated by the score and a count
+        and a matrix holding the score.
+    '''
     # Load shortest path matrix and initialize matrices
     shortest_path_matrix = data.load_shortest_paths()
-    unused_links = np.zeros_like(shortest_path_matrix)  # Counts how many times a link is used
-    matrix1 = np.zeros_like(shortest_path_matrix)
-    matrix2 = np.zeros_like(shortest_path_matrix)
+    # Counts how many times a link is not used despite being equally distant from the target as the used one
+    unused_links = np.zeros_like(shortest_path_matrix)  
+    # counts how many times an unused link has a higher PR score than the used one
+    higherPR_smallerD = np.zeros_like(shortest_path_matrix) 
 
     # Set article names as the index for shortest_path_matrix
     article_names = df_hubs['article_names'].tolist()
     shortest_path_df = pd.DataFrame(shortest_path_matrix, index=article_names, columns=article_names)
 
-    # Map PageRank scores to article names
+    # map PageRank scores to article names
     pagerank_scores = df_hubs.set_index('article_names')['pagerank_score']
-
-    # Create a mapping of article names to indices for faster matrix access
+    # create a mapping of article names to indices for computationally faster matrix access
     article_index = {name: idx for idx, name in enumerate(article_names)}
 
     # Track results
     higher_pagerank_count = 0
     total_comparisons = 0
 
+    # create a list of all links from an article like [[links from article1],[links from a2],[..]....]
     links, prev_link, indices = [], None, []
     for i, link in enumerate(data.links['1st article']):
         if link == prev_link:
@@ -35,11 +43,11 @@ def load_fork_matrix(data, df_hubs):
         prev_link = link
 
 
-    # Convert necessary data to numpy arrays for faster access
+    # convert to numpy arrays for faster access
     pagerank_scores_np = pagerank_scores.to_numpy()
     shortest_path_matrix_np = shortest_path_df.to_numpy()
 
-    # Iterate through each finished path
+    # iterate through each path
     for path in data.paths_finished['path']:
         target_article = path[-1]
         target_index = article_index[target_article]
@@ -47,42 +55,31 @@ def load_fork_matrix(data, df_hubs):
         for i in range(len(path) - 1):
             current_article = path[i]
             next_article = path[i + 1]
-            
             current_index = article_index[current_article]
             next_index = article_index[next_article]
 
-            # Get the shortest distance from the next article to the target
+            # get distance and pagerank of next article for comparison
             next_to_target_dist = shortest_path_matrix_np[next_index, target_index]
             next_article_pagerank = pagerank_scores_np[next_index]
 
-            # Get all valid articles (links) from the current article
+            # get all valid articles linked from the current article
             index = np.where(np.array(indices) == current_article)[0][0]
             valid_indices = np.array([article_index[article] for article in links[index] if article in article_index])
-
-            # Filter articles with the same or shorter distance to the target
+            # get their distance to the target and PR score
             valid_distances = shortest_path_matrix_np[valid_indices, target_index]
             valid_pagerank_scores = pagerank_scores_np[valid_indices]
 
-            # Articles with equal distance and higher PageRank
-            valid_articles_equal = valid_indices[
-                (valid_distances == next_to_target_dist) & (valid_pagerank_scores > next_article_pagerank)
-            ]
+            # articles with equal or shorter distance and higher PageRank
+            valid_articles_higherPR_smallerD = valid_indices[(valid_distances <= next_to_target_dist) & (valid_pagerank_scores > next_article_pagerank)]
+            # articles with equal or shorter distance
+            valid_articles = valid_indices[(valid_distances <= next_to_target_dist)]
 
-            # Articles with shorter distance and higher PageRank
-            valid_articles_less = valid_indices[
-                (valid_distances < next_to_target_dist) & (valid_pagerank_scores > next_article_pagerank)
-            ]
-            valid_articles_page_rank = valid_indices[
-                (valid_pagerank_scores > next_article_pagerank)
-            ]
-
-            # Update matrices
-            unused_links[current_index, valid_articles_page_rank] += 1
-            matrix1[next_index, valid_articles_equal] += 1
-            matrix2[next_index, valid_articles_less] += 1
+            # update matrices
+            unused_links[current_index, valid_articles] += 1
+            higherPR_smallerD[current_index, valid_articles_higherPR_smallerD] += 1
 
             # Count comparisons
-            if valid_articles_equal.size > 0 or valid_articles_less.size > 0:
+            if valid_articles_higherPR_smallerD.size > 0:
                 higher_pagerank_count += 1
 
             total_comparisons += 1
@@ -91,17 +88,33 @@ def load_fork_matrix(data, df_hubs):
     print(f"Total choices made: {total_comparisons}")
     print(f"Choices with higher PageRank alternatives: {higher_pagerank_count}")
     print(f"Percentage: {(higher_pagerank_count / total_comparisons) * 100:.2f}%")
-    return matrix1, matrix2, unused_links, article_names
-
-
-def plot_badChoices(matrix_forgone, unused_links, article_names, df_hubs, data):
-
-    # sum up the columns per article
-    column_sums_forgone = np.array([np.sum(col[col > 0]) for col in (matrix_forgone).T])
-    column_sums_unused = np.array([np.sum(col[col > 0]) for col in (unused_links).T])
-    column_sums = np.where(column_sums_unused > 10, column_sums_forgone / column_sums_unused, np.nan)
     
+    # sum up the column for each article
+    column_sums_unused = np.array([np.sum(col[col > 0]) for col in (unused_links).T])
+    column_sums_higherPR_smallerD = np.array([np.sum(col[col > 0]) for col in (higherPR_smallerD).T])
+    share_overlooked = np.where(column_sums_unused > 10, column_sums_higherPR_smallerD / column_sums_unused, np.nan)
+    
+    # filter out only those articles that have been an option more than once 
+    Overlooked_indices = np.where((1 > share_overlooked))[0]
+    Overlooked_articles_df = pd.DataFrame({
+        'Article': [article_names[i] for i in Overlooked_indices],
+        'Overlooked Value': [share_overlooked[i] for i in Overlooked_indices],
+        'Column Sums UL': [column_sums_unused[i] for i in Overlooked_indices],
+    })
+    
+    # merge into df_hubs
+    df_hubs = df_hubs.merge(Overlooked_articles_df[['Article', 'Column Sums UL', 'Overlooked Value']], left_on='article_names', right_on='Article', how='left')
+    df_hubs.drop(columns=['Article'], inplace=True)
+    # add the first category to the df_hubs
+    df_hubs = df_hubs.merge(right= data.categories[['article_name', '1st cat']], 
+                                    how= 'left',
+                                    left_on='article_names',
+                                    right_on='article_name').drop(columns=['article_name'])
+    return share_overlooked, df_hubs
 
+
+def plot_badChoices(column_sums):
+    # plot a histogram of the share of suboptimal choices
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
     sns.histplot(data=column_sums, bins=40, kde=False, color="#0f4584", alpha=1, ax=ax)
     ax.set_title('Distribution of suboptimal choices')
@@ -109,36 +122,14 @@ def plot_badChoices(matrix_forgone, unused_links, article_names, df_hubs, data):
     ax.set_ylabel('Amount of articles')
     ax.set_yscale('log')
     ax.grid(True, axis='y', color='white', linestyle='-', linewidth=0.5)
+    plt.savefig('DistributionBadChoices.png')
     plt.show()
-    
 
-    # filter out only those articles that have been an option more than once 
-    forgone_indices = np.where((1 > column_sums))[0]
-    forgone_articles_df = pd.DataFrame({
-        'Article': [article_names[i] for i in forgone_indices],
-        'Forgone Value': [column_sums[i] for i in forgone_indices],
-        'Column Sums UL': [column_sums_unused[i] for i in forgone_indices]
-    })
-
-    # sort descending and print
-    top_forgone_articles = forgone_articles_df.sort_values(by='Forgone Value', ascending=False)
-    print('The articles that are forgone the most are:')
-    print(top_forgone_articles.head(20))
-
-    # merge into df_hubs
-    df_hubs = df_hubs.merge(forgone_articles_df[['Article', 'Column Sums UL', 'Forgone Value']], left_on='article_names', right_on='Article', how='left')
-    df_hubs.drop(columns=['Article'], inplace=True)
-    # add the first category to the df_hubs
-    df_hubs = df_hubs.merge(right= data.categories[['article_name', '1st cat']], 
-                                    how= 'left',
-                                    left_on='article_names',
-                                    right_on='article_name').drop(columns=['article_name'])
-    
-    return df_hubs, top_forgone_articles
-
-def plot_hubScoreVSforgone(df_hubs, category=None):
+def plot_hubScoreVSoverlooked(df_hubs, category=None):
+    '''plots the hub score against the overlooked value, 
+    while coloring the points according to category.'''
     # Ignore NaN and choices that appear less than x times
-    df_hubs = df_hubs.dropna(subset=['hub_score', 'Forgone Value'])
+    df_hubs = df_hubs.dropna(subset=['hub_score', 'Overlooked Value'])
     df_hubs = df_hubs[df_hubs['Column Sums UL'] >= 50]
     
     # color according to category
@@ -147,24 +138,26 @@ def plot_hubScoreVSforgone(df_hubs, category=None):
     color = '1st cat'
     category_orders = {'1st cat': categories}
     
+    # make the scatter plot
     fig = px.scatter(
         df_hubs,
         x='hub_score',
-        y='Forgone Value',
+        y='Overlooked Value',
         color=color,
         category_orders=category_orders,
-        hover_data=['article_names', 'Forgone Value', 'Column Sums UL'],
+        hover_data=['article_names', 'Overlooked Value', 'Column Sums UL'],
         log_x=True,
         log_y=True,
-        title='Forgone percentage vs PageRank',
-        labels={'Forgone Value': 'Forgone percentage', 'Column Sums UL': 'Number of Times Link Was Available'},
+        title='User Frequency vs PageRank Score',
+        labels={'Overlooked Value': 'Overlooked Share',
+                 'Column Sums UL': 'Number of Times Link Was Available',
+                   'hub_score': 'PageRank Score',
+                   'article_names': 'Article',
+                   '1st cat': 'Category'},
         )
     
-    fig.update_layout(plot_bgcolor="#ebeaf2", xaxis_title="PageRank")
+    fig.update_layout(plot_bgcolor="#ebeaf2")
     fig.update_traces(marker=dict(size=4, opacity=1))
-    
-    # fig.update_xaxes(range=[0.00001, 0.01])
-    # fig.update_yaxes(range=[0.002, 0.6])
     
     # save plot as html
     if category is None:
