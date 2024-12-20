@@ -22,15 +22,15 @@ We have split our research questions into 3 key areas: <br>
 * Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
 
 ### File Structure
-**`analysis.ipynb/`**:: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
+**`analysis.ipynb/`**: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
 
-**`src/`**:: Contains additional Python scripts that support the analysis. This folder includes data processing scripts and other components necessary for running the full analysis.
+**`src/`**: Contains additional Python scripts that support the analysis. This folder includes data processing scripts and other components necessary for running the full analysis.
 
-**`data/`**:: Stores the data used throughout the project.
+**`data/`**: Stores the data used throughout the project.
 
-**`images/`**:: Contains images for the data story, organized into two subfolders:
-- **`html/`**:: Includes HTML figures generated for the project.
-- **`png/`**:: Includes PNG figures generated for the project.
+**`images/`**: Contains images for the data story, organized into two subfolders:
+- **`html/`**: Includes HTML figures generated for the project.
+- **`png/`**: Includes PNG figures generated for the project.
 
 ### Organization within the team 
 * Michelle:
