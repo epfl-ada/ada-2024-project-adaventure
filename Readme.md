@@ -28,7 +28,8 @@ We have split our research questions into 3 key areas: <br>
 ### File Structure
 **analysis.ipynb:** The main code for analysis contained in the data story is located here. This Jupyter notebook contains the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.\
 **src/:** Contains additional Python scripts supporting the analysis. You can find data processing scripts, and other components necessary for running the full analysis.
-
+**data/**: The data folder contains the data used during the project
+**images/** The images folder contains images for the data story divided into two sub folder html for html figures generated and png for png figures generated
 
 ### Organization within the team 
 * Michelle:
