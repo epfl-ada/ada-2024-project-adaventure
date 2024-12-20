@@ -48,18 +48,8 @@ We have split our research questions into 3 key areas: <br>
   * Analysed user navigation patterns 
   * Worked on data story
  
-### Changes to Research Questions
-The final research questions were slightly altered from the original ones, which can be seen below.
-
-1. #### Hubs <br>
-* What are the defining characteristics of a hub?
-* Which articles serve as the largest hubs on Wikispeedia, and how frequently are they used by players?
-* What types of information are most often contained within hubs, and how are the hubs related to other articles or subject categories?
-
-2. #### User Navigation Patterns <br>
-* What paths are most commonly taken by players, and what does this reveal about public knowledge and associations?
-* Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths?
-* How do common paths differ from lesser-used or “unintuitive” paths between the same articles?
+### Original Research Questions
+The final research questions for part 3 were slightly altered from the original ones. The reason being that further analysis showed the original ones asked questions that were a bit too difficult to answer with the given data. The original research questions for part 3 can be seen below.
 
 3. #### Comparing Hubs and User Navigation Patterns
 * Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
