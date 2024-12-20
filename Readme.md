@@ -21,7 +21,7 @@ We have split our research questions into 3 key areas: <br>
 * How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
 * Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
 
-File Structure
+### File Structure
 **`analysis.ipynb/`**:: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
 
 **`src/`**:: Contains additional Python scripts that support the analysis. This folder includes data processing scripts and other components necessary for running the full analysis.
