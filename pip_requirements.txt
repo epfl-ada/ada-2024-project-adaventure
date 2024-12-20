@@ -1,1 +1,10 @@
-
+numpy
+seaborn
+matplotlib
+pandas
+plotly
+scipy 
+networkx
+sickit-learn
+sentence_transformers
+bs4
