@@ -148,7 +148,7 @@ def plot_hubScoreVSoverlooked(df_hubs, category=None):
         hover_data=['article_names', 'Overlooked Value', 'Column Sums UL'],
         log_x=True,
         log_y=True,
-        title='User Frequency vs PageRank Score',
+        title='Overlooked articles?',
         labels={'Overlooked Value': 'Overlooked Share',
                  'Column Sums UL': 'Number of Times Link Was Available',
                    'hub_score': 'PageRank Score',
