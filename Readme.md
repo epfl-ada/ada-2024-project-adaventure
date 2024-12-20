@@ -14,12 +14,11 @@ We have split our research questions into 3 key areas: <br>
 2. #### User Navigation Patterns <br>
 * What paths are most commonly taken by players, and what does this reveal about public knowledge and associations?
 * Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths?
-* How do common paths differ from lesser-used or “unintuitive” paths between the same articles?
+* Do users exhibit similar behaviors when navigating Wikipedia’s network?
 
 3. #### Comparing Hubs and User Navigation Patterns
-* Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
-* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
-* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
+* To what extent does the reliance on hubs obscure the identification of common knowledge?
+* Is it possible to identify common knowledge in a navigational context despite the influence of network structure?
 
 ### File Structure
 **`analysis.ipynb/`**: The main code for analysis contained in the data story is located here. This Jupyter notebook includes the primary logic and calculations for exploring Wikipedia navigation patterns and analyzing hubs.
@@ -48,3 +47,22 @@ We have split our research questions into 3 key areas: <br>
 * Madeleine : 
   * Analysed user navigation patterns 
   * Worked on data story
+ 
+### Changes to Research Questions
+The final research questions were slightly altered from the original ones, which can be seen below.
+
+1. #### Hubs <br>
+* What are the defining characteristics of a hub?
+* Which articles serve as the largest hubs on Wikispeedia, and how frequently are they used by players?
+* What types of information are most often contained within hubs, and how are the hubs related to other articles or subject categories?
+
+2. #### User Navigation Patterns <br>
+* What paths are most commonly taken by players, and what does this reveal about public knowledge and associations?
+* Where do players tend to "block" or abandon their paths, and what kinds of topics or articles are associated with these unfinished paths?
+* How do common paths differ from lesser-used or “unintuitive” paths between the same articles?
+
+3. #### Comparing Hubs and User Navigation Patterns
+* Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
+* How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
+* Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
+
