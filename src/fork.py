@@ -167,20 +167,78 @@ def plot_hubScoreVSoverlooked(df_hubs, category=None):
     
     fig.show()
 
+def plot_hubScoreVSoverlooked_static(df_hubs, category=None):
+    '''Plots the hub score against the overlooked value, while coloring the points according to category.'''
+    # Ignore NaN and choices that appear less than x times
+    df_hubs = df_hubs.dropna(subset=['hub_score', 'Overlooked Value'])
+    df_hubs = df_hubs[df_hubs['Column Sums UL'] >= 50]
+    
+    # color according to category
+    categories = ['Science', 'Geography', 'Countries', 'History', 'People', 'Religion', 'Citizenship', 'Everyday life',
+             'Design and Technology', 'Language and literature', 'IT', 'Business Studies', 'Music', 'Mathematics', 'Art']
+    color = '1st cat'
+    category_orders = {'1st cat': categories}
+    
+    # Set theme for plot
+    sns.set_theme()
+    plt.figure(figsize=(12, 8))
+    
+    if category is not None:
+        df_hubs = df_hubs[df_hubs['1st cat'] == category]
+        color_col = '1st cat'
+        unique_categories = df_hubs['1st cat'].unique()
+    else:
+        color_col = '1st cat'
+        unique_categories = df_hubs['1st cat'].unique()
+    
+    # Generate a color palette
+    num_colors = len(unique_categories)
+    palette = sns.color_palette("tab20", num_colors)
+    color_mapping = dict(zip(unique_categories, palette))
+    #Scatter plot
+    ax = sns.scatterplot(
+        data=df_hubs,
+        x='hub_score',
+        y='Overlooked Value',
+        hue=color_col,
+        palette=color_mapping,
+        legend='full',
+        s=40,
+        alpha=0.7
+    )
+    
+
+    # Set log scales
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    
+    # Add axis labels, title, legends and set limits on axes
+    plt.xlabel('PageRank Score', fontsize=14)
+    plt.ylabel('Overlooked Share', fontsize=14)
+    if category is not None:
+        plt.title(f'Overlooked articles? ({category})', fontsize=16)
+    else:
+        plt.title('Overlooked articles', fontsize=16)
+
+    plt.legend(title=color_col, bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
+
 def plot_views_forgone(data,df_hubs):
-    df_hubs["category"] = df_hubs["Article"].apply(lambda x: data.get_article_category(x,"1st cat"))
     metadata = pd.read_csv('data/metadata.csv')
     mean_views = metadata['views'].mean()
     df_hubs = df_hubs.merge(metadata[['article_name', 'views']], 
-                        left_on='Article', 
+                        left_on='article_names', 
                         right_on='article_name', 
                         how='left')
 
-    biggest_forgone = df_hubs.groupby( 'category', group_keys=False).apply(lambda x: x.nsmallest(10, 'Forgone Value'))
+    biggest_forgone = df_hubs.groupby( '1st cat', group_keys=False).apply(lambda x: x.nsmallest(10, 'Overlooked Value'))
     plt.figure(figsize=(10, 6)) 
         
     # Double barplot per category and quadrant
-    sns.barplot(data=biggest_forgone, x='category', y='views', hue='category',errorbar=None)
+    sns.barplot(data=biggest_forgone, x='1st cat', y='views', color ='darkblue',errorbar=None)
         
     # Add line for the mean views across all articles 
     plt.axhline(mean_views, color='red', linestyle='--', linewidth=1, label='Mean number views across all articles')
