@@ -92,7 +92,7 @@ def load_overlooked_score(data, df_hubs):
     # sum up the column for each article
     column_sums_unused = np.array([np.sum(col[col > 0]) for col in (unused_links).T])
     column_sums_higherPR_smallerD = np.array([np.sum(col[col > 0]) for col in (higherPR_smallerD).T])
-    share_overlooked = np.where(column_sums_unused > 10, column_sums_higherPR_smallerD / column_sums_unused, np.nan)
+    share_overlooked = np.where((column_sums_unused > 10) & (column_sums_unused != 0), column_sums_higherPR_smallerD / column_sums_unused, np.nan)
     
     # filter out only those articles that have been an option more than once 
     Overlooked_indices = np.where((1 > share_overlooked))[0]

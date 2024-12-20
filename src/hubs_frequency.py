@@ -46,9 +46,9 @@ def get_hub_positions(data, df_hubs):
             shortest_position_usage[i] += 1
 
     # calculate the percentage of hub usage at each position
-    finished_hub_positions = np.divide(finished_hub_positions, finished_position_usage)
-    unfinished_hub_positions = np.divide(unfinished_hub_positions, unfinished_position_usage)
-    shortest_hub_positions = np.divide(shortest_hub_positions, shortest_position_usage)
+    finished_hub_positions = np.divide(finished_hub_positions, finished_position_usage, where=finished_position_usage!=0)
+    unfinished_hub_positions = np.divide(unfinished_hub_positions, unfinished_position_usage, where=unfinished_position_usage!=0)
+    shortest_hub_positions = np.divide(shortest_hub_positions, shortest_position_usage, where=shortest_position_usage!=0)
     return finished_hub_positions, unfinished_hub_positions, shortest_hub_positions
 
 def plot_hub_positions(finished_hub_positions, unfinished_hub_positions, shortest_hub_positions):
