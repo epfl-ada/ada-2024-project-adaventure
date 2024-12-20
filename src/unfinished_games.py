@@ -4,6 +4,11 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from scipy.spatial.distance import cosine
 from collections import Counter
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.sankey import Sankey
+import plotly.graph_objects as go
+
 
 
 
@@ -163,14 +168,17 @@ def is_deadend (data,article,t):
         return True
     return False
 
-def get_distance_totarget(article,target):
+def get_distance_totarget(data):
     """ 
     Get the semantic distance between the stopping article and the target article
     """
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    emb1 = model.encode(article)
-    emb2 = model.encode(target)
-    return cosine(emb1, emb2)
+    stop_target_points = data.paths_unfinished[["stop_point", "target"]].drop_duplicates().values
+    for stop, target in tqdm(stop_target_points):
+        emb1 = model.encode(stop)
+        emb2 = model.encode(target)
+        d = cosine(emb1,emb2)
+        data.paths_unfinished.loc[(data.paths_unfinished["stop_point"]==stop) & (data.paths_unfinished["target"]==target),"distance_to_target"] = d
 
 def get_clics_totarget(data,article,target):
     """
@@ -184,27 +192,151 @@ def get_clics_totarget(data,article,target):
     d = data.matrix[idx_article,idx_target] # Get the shortest path length between the article and the target 
     return d
 
+def abandon_reason(x,t,data):
+    stop_point = x["stop_point"]
+    abandon_reason = None
+    if is_deadend(data,stop_point,t): # If the stopping point is a deadend
+        abandon_reason = "Reached Deadend"
+    else:
+        d = x["distance_to_target"] # Get the semantic distance to the target
+        c = x["clicks_to_target"]
+        if d < 0.1 or c<2:
+            abandon_reason = "Target reached" # If the semantic distance is low, or article is less than two clicks away, the player may consider the target as reached
+        elif d >0.9:
+            abandon_reason = "Target far" # If the semantic distance is high, the player may consider the target as too far and abandon the game
+    return abandon_reason
+
 
 def get_reason_abandon(data,t_dead_end = 1):
     """
     Get the reason for abandoning the unfinished games
     """
-    data.paths_unfinished["stop_point"] = data.paths_unfinished["path"].apply(lambda x : x[-1]) # Get the stopping point of the game
+    tqdm.pandas()
+    data.paths_unfinished["stop_point"] = data.paths_unfinished["path"].progress_apply(lambda x : x[-1]) # Get the stopping point of the game
     data.paths_unfinished["abandon_reason"] = None
 
-    data.paths_unfinished["clicks_to_target"] = data.paths_unfinished.apply(lambda x: get_clics_totarget(data,x["stop_point"],x["target"]),axis=1) # Get the number of clicks missing to reach the target
-    data.paths_unfinished["distance_to_target"] = data.paths_unfinished.apply(lambda x: get_distance_totarget(x["stop_point"],x["target"]),axis=1) # Get the semantic distance from the stopping point to the target
+    data.paths_unfinished["clicks_to_target"] = data.paths_unfinished.progress_apply(lambda x: get_clics_totarget(data,x["stop_point"],x["target"]),axis=1) # Get the number of clicks missing to reach the target
+    get_distance_totarget(data) # Get the semantic distance from the stopping point to the target
+
+    data.paths_unfinished["abandon_reason"] = data.paths_unfinished.progress_apply(lambda x:abandon_reason(x,t_dead_end,data),axis=1)
+
+def get_stoptarget (data):
+    dict ={}
+    for i in tqdm(range(len(data.paths_unfinished))):
+        clicks = data.paths_unfinished.loc[i,"clicks_to_target"]
+        distance = data.paths_unfinished.loc[i,"distance_to_target"]
+        if clicks ==2 and distance >0.5:
+            stop_point = data.paths_unfinished.loc[i,"stop_point"]
+            target = data.paths_unfinished.loc[i,"target"]
+            if (stop_point,target) in dict:
+                dict[(stop_point,target)] += 1
+            else:
+                dict[(stop_point,target)] = 1
+    return dict
+
+def plot_success_rate_heatmap(data):
+    """
+    Plots a heatmap of success rates by (cat_start, cat_target).
     
-    for i in tqdm(range(len(data.paths_unfinished))): # Go through all unfinished paths
-        stop_point = data.paths_unfinished.loc[i,"stop_point"]
-        abandon_reason = None
-        if is_deadend(data,stop_point,t_dead_end): # If the stopping point is a deadend
-            abandon_reason = "deadend"
-        else:
-            d = data.paths_unfinished.loc[i,"distance_to_target"] # Get the semantic distance to the target
-            c = data.paths_unfinished.loc[i,"clicks_to_target"]
-            if d < 0.1 or c<2:
-                abandon_reason = "target_reached" # If the semantic distance is low, or article is less than two clicks away, the player may consider the target as reached
-            elif d >0.9:
-                abandon_reason = "target_far" # If the semantic distance is high, the player may consider the target as too far and abandon the game
-        data.paths_unfinished.loc[i,"abandon_reason"] = abandon_reason
+    Parameters:
+    success_rate (dict): A dictionary where keys are (cat_start, cat_target) pairs 
+                         and values are success rates.
+    """
+
+    success_rate = success_rate_category_pair(data)
+    df = pd.DataFrame(list(success_rate.items()), columns=['Category Pair', 'Success Rate'])
+    df[['Start Category', 'Target Category']] = pd.DataFrame(df['Category Pair'].tolist(), index=df.index)
+    df.drop(columns=['Category Pair'], inplace=True)
+
+    heatmap_data = df.pivot(index='Start Category', columns='Target Category', values='Success Rate')
+
+    plt.figure(figsize=(7,5))
+    sns.heatmap(heatmap_data, cmap = 'Blues')
+    plt.title("Success Rate by (Start Category, Target Category)")
+    plt.xlabel("Target Category")
+    plt.ylabel("Start Category")
+
+    plt.show()
+
+
+def fig_to_target(data):
+    clicks_to_target = data.paths_unfinished['clicks_to_target']
+    click_counts = pd.Series(clicks_to_target).value_counts().sort_index()
+    distance_to_target = data.paths_unfinished['distance_to_target']
+
+    plt.figure()
+    sns.barplot(x=click_counts.index,y=click_counts.values)
+    plt.title("Number of clicks missing to reach the target")
+    plt.xlabel("Number of clicks")
+    plt.ylabel("Number of unfinished games")
+
+    plt.show()
+
+    plt.figure()
+    sns.histplot(x=distance_to_target,color= "Red")
+    plt.title("Semantic distance from stopping point to target article")
+    plt.xlabel("Distance to target")
+    plt.ylabel("Number of unfinished games")
+
+    plt.show()
+
+
+
+
+def bar_plot_connections(data):
+    dict_pairs = get_stoptarget(data)
+    dict_common = {k: v for k, v in dict_pairs.items() if v >= 10}
+    dict_c = {}
+    for articles in dict_common.keys():
+        stop = articles[0]
+        target = articles[1]
+        if stop in data.categories["article_name"].values and target in data.categories["article_name"].values:
+            cat_stop = data.get_article_category(stop, "1st cat")
+            cat_target = data.get_article_category(target, "1st cat")
+            if (cat_stop, cat_target) in dict_c:
+                dict_c[(cat_stop, cat_target)] += 1
+            else:
+                dict_c[(cat_stop, cat_target)] = 1
+
+    data_dict = {"Start": [], "Target": [], "Value": []}
+    for (cat_start, cat_end), value in dict_c.items():
+        data_dict["Start"].append(cat_start)
+        data_dict["Target"].append(cat_end)
+        data_dict["Value"].append(value)
+
+    df = pd.DataFrame(data_dict)
+
+    # Transform to plot
+    pivot = df.pivot(index="Start", columns="Target", values="Value").fillna(0)
+
+    colors = sns.color_palette("Set2", len(pivot.columns))  
+    ax = pivot.plot(
+        kind="bar",
+        stacked=True,
+        figsize=(12, 8),
+        color=colors,
+        edgecolor="black",
+        linewidth=0.5,
+        alpha=0.9,
+    )
+
+    ax.set_ylabel("Commonly unkown connections between categories", fontsize=12)
+    ax.set_xlabel("Start Category", fontsize=12)
+    ax.legend(
+        title="Target Category",
+        bbox_to_anchor=(1.05, 1),
+        loc="upper left",
+        fontsize=10,
+        title_fontsize=12,
+    )
+
+    plt.xticks(rotation=45, fontsize=10, ha="right")
+    plt.yticks(fontsize=10)
+    plt.title("Commonly unkown connections between categories", fontsize=14)
+    plt.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.7)
+    plt.tight_layout()
+
+    plt.show()
+
+
+

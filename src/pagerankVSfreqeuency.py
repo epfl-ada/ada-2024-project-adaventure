@@ -153,9 +153,17 @@ def plot_pageVSfreq_static(freVpr, category=None):
     # Show the plot
     plt.show()
 
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 def get_quadrant_views(freVpr):
     # Add views from metadata to freVpr
     metadata = pd.read_csv('data/metadata.csv')
+    mean_views = metadata['views'].mean()
     freVpr = freVpr.merge(right=metadata[['article_name', 'views']], how='left', on='article_name')
 
     # Calculates correlation that views has to pagerank score and user frequency
@@ -186,7 +194,10 @@ def get_quadrant_views(freVpr):
     freVpr_normalised['quadrant'] = np.select(conditions, categories, default='no quadrant')
 
     # Keep the 10 biggest outliers in each quadrant
-    biggest_outliers = freVpr_normalised.groupby('quadrant', group_keys=False).apply(lambda x: x.nlargest(20, 'dist_to_mean'))
+    biggest_outliers = freVpr_normalised.groupby(['quadrant', 'Category'], group_keys=False).apply(lambda x: x.nlargest(10, 'dist_to_mean'))
+    biggest_outliers = biggest_outliers[
+        biggest_outliers['quadrant'].isin(['lower right', 'upper left'])
+    ]
 
     # Calculate mean of the lower right and upper left quadrants
     quadrant_data = biggest_outliers.groupby(by='quadrant')['views'].mean().reset_index()
@@ -194,12 +205,20 @@ def get_quadrant_views(freVpr):
 
     # Create and save plot
     plt.figure(figsize=(10, 6)) 
-    sns.barplot(data=quadrant_data, x='quadrant', y='views', color="#0f4584")
+    
+    # Double barplot per category and quadrant
+    sns.barplot(data=biggest_outliers, x='Category', y='views', hue='quadrant',errorbar=None)
+    
+    # Add line for the mean views across all articles 
+    plt.axhline(mean_views, color='red', linestyle='--', linewidth=1, label='Mean number views across all articles')
     plt.title('Average monthly views of the biggest outliers', fontsize=16)
     plt.xlabel('Quadrant', fontsize=14)
+    plt.xticks(rotation=90)
     plt.ylabel('Average monthly views', fontsize=14)
 
-    plt.savefig("views_per_quadrant.png", bbox_inches='tight', dpi=300)
+    plt.legend(title='Category', loc='upper right')
+    plt.tight_layout()
+    plt.savefig("views_per_quadrant.png", dpi=300)
     plt.show()
 
     print("Spearman correlation between amount of views and user frequency: ", correlationUF)

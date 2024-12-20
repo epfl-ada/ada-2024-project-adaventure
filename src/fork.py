@@ -174,3 +174,33 @@ def plot_hubScoreVSforgone(df_hubs, category=None):
     
     fig.show()
 
+def plot_views_forgone(data,df_hubs):
+    df_hubs["category"] = df_hubs["Article"].apply(lambda x: data.get_article_category(x,"1st cat"))
+    metadata = pd.read_csv('data/metadata.csv')
+    mean_views = metadata['views'].mean()
+    df_hubs = df_hubs.merge(metadata[['article_name', 'views']], 
+                        left_on='Article', 
+                        right_on='article_name', 
+                        how='left')
+
+    biggest_forgone = df_hubs.groupby( 'category', group_keys=False).apply(lambda x: x.nsmallest(10, 'Forgone Value'))
+    plt.figure(figsize=(10, 6)) 
+        
+    # Double barplot per category and quadrant
+    sns.barplot(data=biggest_forgone, x='category', y='views', hue='category',errorbar=None)
+        
+    # Add line for the mean views across all articles 
+    plt.axhline(mean_views, color='red', linestyle='--', linewidth=1, label='Mean number views across all articles')
+    plt.title('Average monthly views of the biggest overlooked articles', fontsize=16)
+    plt.xlabel('Quadrant', fontsize=14)
+    plt.xticks(rotation=90)
+    plt.ylabel('Average monthly views', fontsize=14)
+
+    plt.legend(title='Category', loc='upper right')
+    plt.tight_layout()
+    plt.savefig("views_forgone.png", dpi=300)
+    plt.show()
+
+
+
+

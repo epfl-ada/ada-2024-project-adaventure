@@ -8,7 +8,7 @@ import seaborn as sns
 from scipy.spatial.distance import cosine
 from sentence_transformers import SentenceTransformer
 import random
-
+import pickle
 
 
 
@@ -83,7 +83,7 @@ def get_games(data):
 
     return games
 
-def get_sim_matrix(data,start,end,distance):
+def get_sim_matrix(data,start,end,distance,is_Bert =False):
     """
     Compute the similarity matrix for a game played from start to end
     """
@@ -94,13 +94,13 @@ def get_sim_matrix(data,start,end,distance):
     if len(paths) == 1:
         print("Only one game played from ", start, " to ", end) # Only one game played from start to end (no similarity)
         return None
-    if distance == distance_Bert:
+    if is_Bert:
         embeddings = embedding_Bert(paths["path"].values)
     for i in range(len(paths)):
         path1 = paths["path"].values[i]
-        for j in tqdm(range(len(paths))):
+        for j in range(len(paths)):
             path2 = paths["path"].values[j]
-            if distance == distance_Bert:
+            if is_Bert:
                 sim = distance(embeddings,i,j)
             else:
                 sim = max(distance(data,path1,path2),distance(data,path2,path1)) # Compute the similarity between the two paths
@@ -108,28 +108,64 @@ def get_sim_matrix(data,start,end,distance):
             matrix_distance[i][j] = sim
     return matrix_distance
 
-def get_sim_matrix_random(data,distance):
+def get_mean_sim_distrib(data,games,distance = distance_Bert,load=True):
     """
-    Compute the similarity matrix for a game played from start to end
+    Computes the mean similarity between two players paths for every finished games. 
     """
-    paths =[get_random_path(data) for i in range(100)]
-    matrix_distance = np.zeros((len(paths),len(paths)))
-    embeddings = embedding_Bert(paths)
-    for i in range(len(paths)):
-        for j in tqdm(range(len(paths))):
-            sim = distance(embeddings,i,j)
-            
-            matrix_distance[i][j] = sim
-    return matrix_distance
+    if load :
+        with open('data/mean_sim_distrib.pkl', 'rb') as f:
+            mean_sim_distrib = pickle.load(f)
+    else:
+        mean_sim_distrib = []
+        for i in range(len(games)):
+            start = games.loc[i,"start"]
+            end = games.loc[i,"end"]
+            matrix_sim = get_sim_matrix(data,start,end,distance)
+            if matrix_sim is not None:
+                mean = np.mean(matrix_sim)
+                mean_sim_distrib.append(mean)
+        with open('data/mean_sim_distrib.pkl', 'wb') as f:
+            pickle.dump(mean_sim_distrib, f)
+    return mean_sim_distrib
 
-def plot_sim_matrices(data,starts,ends,distance = distance_Jaccard,title = "Similarity matrix",**kwargs):
+def get_mean_sim_random(data,n_pairs):
+    mean =0
+    for k in tqdm(range(n_pairs)):
+        path1 = get_random_path(data)
+        path2 = get_random_path(data)
+        embeddings = embedding_Bert([path1,path2])
+        d = distance_Bert(embeddings,0,1)
+        mean += d
+    return mean/n_pairs
+
+def plot_sim_distrib(data,games,distance = distance_Bert,n_pairs_random=100):
+    mean_sim_distrib = get_mean_sim_distrib(data,games,distance=distance)
+    mean_random = get_mean_sim_random(data,n_pairs_random)
+    mean_games = np.mean(mean_sim_distrib)
+
+    plt.figure(figsize=(7, 6))  
+    sns.histplot(mean_sim_distrib, kde=False, color="darkblue")
+
+    plt.axvline(x=mean_random, linestyle="--", color="darkgreen", label="Mean distance for random paths")
+    plt.axvline(x=mean_games, linestyle="--", color="red", label="Mean distance for all finished games")
+
+    plt.title('Distribution of the mean semantic distance\nbetween paths for all finished games', fontsize=14)
+    plt.xlabel('Mean distance', fontsize=12)
+    plt.ylabel('Number of games', fontsize=12)
+    plt.xlim(0, 1)  
+    plt.legend(loc="upper right", fontsize=10)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_sim_matrices(data,starts,ends,distance = distance_Jaccard,title = "Similarity matrix",is_Bert=False,**kwargs):
     """
     Plot the similarity matrices for the games played from starts to ends
     """
     for i in range(len(starts)):
         start = starts[i]
         end = ends[i]
-        matrix_sim = get_sim_matrix(data,start,end,distance)
+        matrix_sim = get_sim_matrix(data,start,end,distance,is_Bert=is_Bert)
         if matrix_sim is not None:
             print("Game from ",start," to ",end)
             plt.figure(figsize=(7,5))
@@ -157,7 +193,7 @@ def following_article(article,paths):
     dict ={x:list.count(x) for x in list} # Count the number of players who visited each article in dictionnary after the article
     return dict
 
-def distance_first_article(data,start,end):
+def distance_first_article(data,start,end,distance=distance_matrix):
     """
     Compute the mean distance of first articles visited after start
     """

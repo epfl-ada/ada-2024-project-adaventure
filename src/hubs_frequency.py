@@ -51,7 +51,6 @@ def get_hub_positions(data, df_hubs):
 
 def plot_hub_positions(df_hubs, finished_hub_positions, unfinished_hub_positions, shortest_hub_positions):
     # Plot the results
-    print(np.percentile(df_hubs["hub_score"], 95))
     plt.figure(figsize=(12, 6))
     plt.plot(range(1, len(finished_hub_positions) + 1), finished_hub_positions, label='Finished Games', color='green')
     plt.plot(range(1, len(unfinished_hub_positions) + 1), unfinished_hub_positions, label='Unfinished Games', color='red')
