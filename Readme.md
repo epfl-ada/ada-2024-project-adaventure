@@ -31,6 +31,9 @@ We have split our research questions into 3 key areas: <br>
 - **`html/`**: Includes HTML figures generated for the project.
 - **`png/`**: Includes PNG figures generated for the project.
 
+### External data
+* In order to validate the results in part 3 an external dataset of monthly visits to Wikipedia articles was gathered using the Wikimedia api.
+
 ### Organization within the team 
 * Michelle:
   * Wrote algorithm for PageRank and analysed results
@@ -48,6 +51,8 @@ We have split our research questions into 3 key areas: <br>
   * Analysed user navigation patterns 
   * Worked on data story
  
+  
+ 
 ### Original Research Questions
 The final research questions for part 3 were slightly altered from the original ones. The reason being that further analysis showed the original ones asked questions that were a bit too difficult to answer with the given data. The original research questions for part 3 can be seen below.
 
@@ -55,4 +60,9 @@ The final research questions for part 3 were slightly altered from the original 
 * Can we determine areas of common knowledge or knowledge gaps by comparing user patterns with hubs?
 * How do hubs affect the efficiency of user paths? Do users who navigate through hubs tend to complete paths more successfully or with fewer clicks?
 * Are highly linked hubs also more accessible, or do users tend to bypass them for other, potentially less-linked but more intuitive articles?
+
+### Citations
+
+* Nils Reimers, Iryna Gurevych. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. arXiv. https://arxiv.org/abs/ArticleID
+* L. Page, S. Brin, R. Motwani, and T. Winograd. (1999). The PageRank Citation Ranking: Bringing Order to the Web.  Stanford InfoLab. http://ilpubs.stanford.edu:8090/422/
 
